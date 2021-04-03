@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
-import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './resolvers/user';
@@ -38,7 +37,7 @@ const main = async () => {
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [HelloResolver, PostResolver, UserResolver],
+			resolvers: [PostResolver, UserResolver],
 		}),
 		context: ({ req, res }) => ({ req, res }),
 	});

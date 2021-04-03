@@ -22,10 +22,10 @@ mutation {
 
 describe('something', () => {
 	it('does stuff', async () => {
-		console.log(
-			await gCall({
-				source: thing,
-			})
-		);
+		const stuff = await gCall({
+			source: thing,
+		});
+
+		console.log(stuff);
 	});
 });
