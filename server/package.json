@@ -6,7 +6,9 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "nodemon dist/index.js",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "db:setup": "ts-node ./test/test-utils/setup.ts",
+    "test": "npm run db:setup && jest --coverage --detectOpenHandles"
   },
   "mikro-orm": {
     "useTsNode": true,

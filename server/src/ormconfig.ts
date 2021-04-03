@@ -10,7 +10,7 @@ const config: ConnectionOptions = {
 	database: 'draft-online',
 	logging: true,
 	synchronize: true,
-	entities: ['dist/entities/*.js'],
+	entities: ['./dist/entities/*.js'],
 	migrations: ['dist/migrations/*.js'],
 };
 
