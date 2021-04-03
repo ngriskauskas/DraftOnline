@@ -22,24 +22,23 @@ class UsernamePasswordInput {
 @Resolver()
 export class UserResolver {
 	@Query(() => User)
-	async me(@Ctx() { em, req }: MyContext): Promise<User> {
+	async me(@Ctx() { req }: MyContext): Promise<User> {
 		if (!req.session.userId) {
 			throw Error('Not Logged In');
 		}
-		return await em.findOneOrFail(User, { id: req.session.userId });
+		return await User.findOneOrFail(req.session.userId);
 	}
 
 	@Mutation(() => User)
 	async register(
-		@Arg('options') options: UsernamePasswordInput,
-		@Ctx() { em }: MyContext
+		@Arg('options') options: UsernamePasswordInput
 	): Promise<User> {
 		try {
-			const user = em.create(User, {
+			const user = User.create({
 				username: options.username,
 				password: await hash(options.password),
-			});
-			await em.persistAndFlush(user);
+			}).save();
+
 			return user;
 		} catch (err) {
 			switch (err.name) {
@@ -54,10 +53,10 @@ export class UserResolver {
 	@Mutation(() => User)
 	async login(
 		@Arg('options') options: UsernamePasswordInput,
-		@Ctx() { em, req }: MyContext
+		@Ctx() { req }: MyContext
 	): Promise<User> {
-		const user = await em.findOneOrFail(User, {
-			username: options.username,
+		const user = await User.findOneOrFail({
+			where: { username: options.username },
 		});
 		if (!(await verify(user.password, options.password)))
 			throw Error('Bad Password');
