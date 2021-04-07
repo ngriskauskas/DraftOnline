@@ -10,12 +10,15 @@ import {
 	Resolver,
 } from 'type-graphql';
 import { hash, verify } from 'argon2';
+import { Length } from 'class-validator';
 
 @InputType()
-class UsernamePasswordInput {
+export class UserInput {
 	@Field()
+	@Length(4, 16)
 	username: string;
 	@Field()
+	@Length(4)
 	password: string;
 }
 
@@ -24,42 +27,43 @@ export class UserResolver {
 	@Query(() => User)
 	async me(@Ctx() { req }: MyContext): Promise<User> {
 		if (!req.session.userId) {
-			throw Error('Not Logged In');
+			throw new Error('Not Logged In');
 		}
 		return await User.findOneOrFail(req.session.userId);
 	}
 
 	@Mutation(() => User)
 	async register(
-		@Arg('options') options: UsernamePasswordInput
+		@Arg('input') input: UserInput,
+		@Ctx() { req }: MyContext
 	): Promise<User> {
 		try {
-			const user = User.create({
-				username: options.username,
-				password: await hash(options.password),
+			const user = await User.create({
+				username: input.username,
+				password: await hash(input.password),
 			}).save();
-
+			req.session.userId = user.id;
 			return user;
 		} catch (err) {
-			switch (err.name) {
-				case 'UniqueConstraintViolationException':
-					throw new Error('Username already exists');
-				default:
-					throw err;
-			}
+			if (err.message.includes('duplicate')) {
+				throw new Error('User Already Exists');
+			} else throw err;
 		}
 	}
 
 	@Mutation(() => User)
 	async login(
-		@Arg('options') options: UsernamePasswordInput,
+		@Arg('input') input: UserInput,
 		@Ctx() { req }: MyContext
 	): Promise<User> {
-		const user = await User.findOneOrFail({
-			where: { username: options.username },
+		const user = await User.findOne({
+			where: { username: input.username },
 		});
-		if (!(await verify(user.password, options.password)))
-			throw Error('Bad Password');
+		if (!user) {
+			throw new Error('Incorrect Username or Password');
+		}
+		if (!(await verify(user.password, input.password)))
+			throw new Error('Incorrect Username or Password');
 
 		req.session.userId = user.id;
 		return user;

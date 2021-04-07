@@ -10,6 +10,7 @@ import connectRedis from 'connect-redis';
 import { __prod__, __session__ } from './constants';
 import { createConnection } from 'typeorm';
 import config from './ormconfig';
+import cors from 'cors';
 
 const main = async () => {
 	await createConnection(config);
@@ -18,6 +19,13 @@ const main = async () => {
 
 	const RedisStore = connectRedis(session);
 	const redisClient = redis.createClient();
+
+	app.use(
+		cors({
+			origin: 'http://localhost:3000',
+			credentials: true,
+		})
+	);
 
 	app.use(
 		session({
@@ -40,11 +48,12 @@ const main = async () => {
 			resolvers: [PostResolver, UserResolver],
 		}),
 		context: ({ req, res }) => ({ req, res }),
+		debug: false,
 	});
 
-	apolloServer.applyMiddleware({ app });
+	apolloServer.applyMiddleware({ app, cors: false });
 	app.listen(4000, () => {
-		console.log('server listening on localhost:4000');
+		console.log('server listening on http://localhost:4000');
 	});
 };
 main().catch((err) => {

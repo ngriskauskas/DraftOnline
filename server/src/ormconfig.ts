@@ -8,7 +8,7 @@ const config: ConnectionOptions = {
 	username: 'postgres',
 	password: __dbPassword__,
 	database: 'draft-online',
-	logging: true,
+	logging: false,
 	synchronize: true,
 	entities: ['./dist/entities/*.js'],
 	migrations: ['dist/migrations/*.js'],

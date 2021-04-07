@@ -1,0 +1,77 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\Noah\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add cors
+
+PATH: 
+  C:\Python39\Scripts\;C:\Python39\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\Noah\AppData\Local\Programs\Python\Python37\Scripts;C:\Program Files\Calibre2\;C:\ProgramData\chocolatey\bin;;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn\;C:\Users\Noah\AppData\Local\Microsoft\WindowsApps;C:\Users\Noah\.dotnet\tools;C:\Users\Noah\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Noah\AppData\Local\Yarn\bin;C:\Users\Noah\AppData\Roaming\npm;C:\Users\Noah\AppData\Local\Microsoft\WindowsApps;C:\MinGW\bin;C:\Program Files (x86)\GnuWin32\bin\make.exe;C:\Users\Noah\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Program Files (x86)\Nmap;C:\Program Files\JetBrains\JetBrains Rider 2020.3.3\bin;;C:\Users\Noah\.dotnet\tools;C:\Program Files\PostgreSQL\13\bin;C:\Program Files\PostgreSQL\13\lib;
+
+Yarn version: 
+  1.16.0
+
+Node version: 
+  14.15.5
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: EPERM: operation not permitted, unlink 'C:\Users\Noah\source\repos\DraftOnline\server\node_modules\argon2\lib\binding\napi-v3\argon2.node'
+
+npm manifest: 
+  {
+    "name": "draft-online-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "watch": "tsc -w",
+      "dev": "nodemon dist/index.js",
+      "start": "node dist/index.js",
+      "db:setup": "ts-node ./test/test-utils/setup.ts",
+      "test": "npm run db:setup && jest --coverage --detectOpenHandles"
+    },
+    "mikro-orm": {
+      "useTsNode": true,
+      "configPaths": [
+        "./src/mikro-orm.config.ts",
+        "./dist/mikro-orm.config.js"
+      ]
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/babel__core": "^7.1.14",
+      "@types/connect-redis": "^0.0.16",
+      "@types/express": "^4.17.11",
+      "@types/express-session": "^1.17.3",
+      "@types/jest": "^26.0.22",
+      "@types/node": "^14.14.37",
+      "@types/redis": "^2.8.28",
+      "jest": "^26.6.3",
+      "nodemon": "^2.0.7",
+      "ts-jest": "^26.5.4",
+      "ts-node": "^9.1.1",
+      "typescript": "^4.2.3"
+    },
+    "dependencies": {
+      "apollo-server-express": "^2.22.2",
+      "argon2": "^0.27.2",
+      "class-validator": "^0.13.1",
+      "connect-redis": "^5.1.0",
+      "dotenv": "^8.2.0",
+      "express": "^4.17.1",
+      "express-session": "^1.17.1",
+      "graphql": "^15.5.0",
+      "pg": "^8.5.1",
+      "redis": "^3.1.0",
+      "reflect-metadata": "^0.1.13",
+      "type-graphql": "^1.1.1",
+      "typeorm": "^0.2.32"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

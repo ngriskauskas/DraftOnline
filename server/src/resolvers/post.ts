@@ -9,8 +9,8 @@ export class PostResolver {
 	}
 
 	@Query(() => Post, { nullable: true })
-	post(@Arg('id') id: number): Promise<Post> {
-		return Post.findOneOrFail(id);
+	post(@Arg('id') id: number): Promise<Post | undefined> {
+		return Post.findOne(id);
 	}
 
 	@Mutation(() => Post)
