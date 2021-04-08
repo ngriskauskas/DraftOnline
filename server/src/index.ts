@@ -7,7 +7,7 @@ import { UserResolver } from './resolvers/user';
 import redis from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import { __prod__, __session__ } from './constants';
+import { COOKIE_NAME, __prod__, __session__ } from './constants';
 import { createConnection } from 'typeorm';
 import config from './ormconfig';
 import cors from 'cors';
@@ -29,7 +29,7 @@ const main = async () => {
 
 	app.use(
 		session({
-			name: 'qid',
+			name: COOKIE_NAME,
 			store: new RedisStore({ client: redisClient }),
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 30, //30 days

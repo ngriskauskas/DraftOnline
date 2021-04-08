@@ -1,159 +1,178 @@
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = {
+	[K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+	{ [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+	{ [SubKey in K]: Maybe<T[SubKey]> };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+	ID: string;
+	String: string;
+	Boolean: boolean;
+	Int: number;
+	Float: number;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  createPost: Post;
-  updatePost?: Maybe<Post>;
-  deletePost?: Maybe<Post>;
-  register: User;
-  login: User;
+	__typename?: 'Mutation';
+	createPost: Post;
+	updatePost?: Maybe<Post>;
+	deletePost?: Maybe<Post>;
+	register: User;
+	login: User;
+	logout: Scalars['Boolean'];
 };
-
 
 export type MutationCreatePostArgs = {
-  title: Scalars['String'];
+	title: Scalars['String'];
 };
-
 
 export type MutationUpdatePostArgs = {
-  title?: Maybe<Scalars['String']>;
-  id: Scalars['Float'];
+	title?: Maybe<Scalars['String']>;
+	id: Scalars['Float'];
 };
-
 
 export type MutationDeletePostArgs = {
-  id: Scalars['Float'];
+	id: Scalars['Float'];
 };
-
 
 export type MutationRegisterArgs = {
-  input: UserInput;
+	input: UserInput;
 };
 
-
 export type MutationLoginArgs = {
-  input: UserInput;
+	input: UserInput;
 };
 
 export type Post = {
-  __typename?: 'Post';
-  id: Scalars['Int'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  title: Scalars['String'];
+	__typename?: 'Post';
+	id: Scalars['Int'];
+	createdAt: Scalars['String'];
+	updatedAt: Scalars['String'];
+	title: Scalars['String'];
 };
 
 export type Query = {
-  __typename?: 'Query';
-  posts: Array<Post>;
-  post?: Maybe<Post>;
-  me: User;
+	__typename?: 'Query';
+	posts: Array<Post>;
+	post?: Maybe<Post>;
+	me: User;
 };
 
-
 export type QueryPostArgs = {
-  id: Scalars['Float'];
+	id: Scalars['Float'];
 };
 
 export type User = {
-  __typename?: 'User';
-  id: Scalars['Float'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  username: Scalars['String'];
+	__typename?: 'User';
+	id: Scalars['Float'];
+	createdAt: Scalars['String'];
+	updatedAt: Scalars['String'];
+	username: Scalars['String'];
 };
 
 export type UserInput = {
-  username: Scalars['String'];
-  password: Scalars['String'];
+	username: Scalars['String'];
+	password: Scalars['String'];
 };
+
+export type RegularUserFragment = { __typename?: 'User' } & Pick<
+	User,
+	'id' | 'username'
+>;
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+	username: Scalars['String'];
+	password: Scalars['String'];
 }>;
 
+export type LoginMutation = { __typename?: 'Mutation' } & {
+	login: { __typename?: 'User' } & RegularUserFragment;
+};
 
-export type LoginMutation = (
-  { __typename?: 'Mutation' }
-  & { login: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
-  ) }
-);
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type LogoutMutation = { __typename?: 'Mutation' } & Pick<
+	Mutation,
+	'logout'
+>;
 
 export type RegisterMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+	username: Scalars['String'];
+	password: Scalars['String'];
 }>;
 
+export type RegisterMutation = { __typename?: 'Mutation' } & {
+	register: { __typename?: 'User' } & RegularUserFragment;
+};
 
-export type RegisterMutation = (
-  { __typename?: 'Mutation' }
-  & { register: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
-  ) }
-);
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQuery = { __typename?: 'Query' } & {
+	me: ({ __typename?: 'User' } & RegularUserFragment) | null;
+};
 
-
-export type MeQuery = (
-  { __typename?: 'Query' }
-  & { me: (
-    { __typename?: 'User' }
-    & Pick<User, 'username'>
-  ) }
-);
-
-
+export const RegularUserFragmentDoc = gql`
+	fragment RegularUser on User {
+		id
+		username
+	}
+`;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(input: {username: $username, password: $password}) {
-    id
-    username
-  }
-}
-    `;
+	mutation Login($username: String!, $password: String!) {
+		login(input: { username: $username, password: $password }) {
+			...RegularUser
+		}
+	}
+	${RegularUserFragmentDoc}
+`;
 
 export function useLoginMutation() {
-  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
-};
-export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!) {
-  register(input: {username: $username, password: $password}) {
-    id
-    username
-  }
+	return Urql.useMutation<LoginMutation, LoginMutationVariables>(
+		LoginDocument
+	);
 }
-    `;
+export const LogoutDocument = gql`
+	mutation Logout {
+		logout
+	}
+`;
+
+export function useLogoutMutation() {
+	return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(
+		LogoutDocument
+	);
+}
+export const RegisterDocument = gql`
+	mutation Register($username: String!, $password: String!) {
+		register(input: { username: $username, password: $password }) {
+			...RegularUser
+		}
+	}
+	${RegularUserFragmentDoc}
+`;
 
 export function useRegisterMutation() {
-  return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
-};
-export const MeDocument = gql`
-    query Me {
-  me {
-    username
-  }
+	return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(
+		RegisterDocument
+	);
 }
-    `;
+export const MeDocument = gql`
+	query Me {
+		me {
+			...RegularUser
+		}
+	}
+	${RegularUserFragmentDoc}
+`;
 
-export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
-};
+export function useMeQuery(
+	options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}
+) {
+	return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+}
