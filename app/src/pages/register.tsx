@@ -6,17 +6,18 @@ import Wrapper from '../components/Wrapper';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { Box } from '@chakra-ui/layout';
-import { useRouter } from 'next/router';
+import router from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
 
 interface registerProps {}
 
 const Register: FC<registerProps> = ({}) => {
 	const [, register] = useRegisterMutation();
-	const router = useRouter();
 	return (
 		<Wrapper variant='small'>
 			<Formik
-				initialValues={{ username: '', password: '' }}
+				initialValues={{ email: '', username: '', password: '' }}
 				onSubmit={async (values, { setErrors }) => {
 					const response = await register(values);
 					if (response.error) {
@@ -28,6 +29,9 @@ const Register: FC<registerProps> = ({}) => {
 				{({ isSubmitting }) => (
 					<Form>
 						<InputField name='username' label='Username' />
+						<Box mt={4}>
+							<InputField name='email' label='Email' />
+						</Box>
 						<Box mt={4}>
 							<InputField
 								name='password'
@@ -47,4 +51,4 @@ const Register: FC<registerProps> = ({}) => {
 	);
 };
 
-export default Register;
+export default withUrqlClient(createUrqlClient)(Register);

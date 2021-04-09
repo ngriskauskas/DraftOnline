@@ -6,28 +6,29 @@ import Wrapper from '../components/Wrapper';
 import { useLoginMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { Box } from '@chakra-ui/layout';
-import { useRouter } from 'next/router';
+import router from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
 
 interface loginProps {}
 
 const Login: FC<loginProps> = ({}) => {
 	const [, login] = useLoginMutation();
-	const router = useRouter();
 	return (
 		<Wrapper variant='small'>
 			<Formik
-				initialValues={{ username: '', password: '' }}
+				initialValues={{ email: '', password: '' }}
 				onSubmit={async (values, { setErrors }) => {
 					const response = await login(values);
 					if (response.error) {
-						setErrors(toErrorMap(response.error, 'username'));
+						setErrors(toErrorMap(response.error, 'email'));
 					} else {
 						router.push('/');
 					}
 				}}>
 				{({ isSubmitting }) => (
 					<Form>
-						<InputField name='username' label='Username' />
+						<InputField name='email' label='Email' />
 						<Box mt={4}>
 							<InputField
 								name='password'
@@ -47,4 +48,4 @@ const Login: FC<loginProps> = ({}) => {
 	);
 };
 
-export default Login;
+export default withUrqlClient(createUrqlClient)(Login);

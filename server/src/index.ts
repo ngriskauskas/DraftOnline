@@ -4,7 +4,7 @@ import express from 'express';
 import { PostResolver } from './resolvers/post';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './resolvers/user';
-import redis from 'redis';
+import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { COOKIE_NAME, __prod__, __session__ } from './constants';
@@ -18,7 +18,7 @@ const main = async () => {
 	const app = express();
 
 	const RedisStore = connectRedis(session);
-	const redisClient = redis.createClient();
+	const redis = new Redis();
 
 	app.use(
 		cors({
@@ -30,7 +30,7 @@ const main = async () => {
 	app.use(
 		session({
 			name: COOKIE_NAME,
-			store: new RedisStore({ client: redisClient }),
+			store: new RedisStore({ client: redis }),
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 30, //30 days
 				httpOnly: true,
@@ -47,7 +47,7 @@ const main = async () => {
 		schema: await buildSchema({
 			resolvers: [PostResolver, UserResolver],
 		}),
-		context: ({ req, res }) => ({ req, res }),
+		context: ({ req, res }) => ({ req, res, redis }),
 		debug: false,
 	});
 
