@@ -21,7 +21,7 @@ const Login: FC<loginProps> = ({}) => {
 				if (response.error) {
 					setErrors(toErrorMap(response.error, 'email'));
 				} else {
-					router.push('/');
+					router.push((router.query.next as string) ?? '/');
 				}
 			}}
 			submissionComponent={

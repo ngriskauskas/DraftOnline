@@ -13,8 +13,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 	});
 	const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 	let userInfoBody = null;
-	if (fetching) {
-		userInfoBody = null;
+	if (isServer() || fetching) {
 	} else if (!data?.me) {
 		userInfoBody = (
 			<>

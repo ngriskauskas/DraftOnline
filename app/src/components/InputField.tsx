@@ -3,15 +3,17 @@ import {
 	FormErrorMessage,
 	FormLabel,
 } from '@chakra-ui/form-control';
-import { Input } from '@chakra-ui/react';
+import { Input, Textarea } from '@chakra-ui/react';
 import { useField } from 'formik';
-import React, { FC, InputHTMLAttributes } from 'react';
+import React, { FC, InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
-type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-	name: string;
-	label?: string;
-	placehoder?: string;
-};
+type InputFieldProps = InputHTMLAttributes<HTMLInputElement> &
+	TextareaHTMLAttributes<HTMLTextAreaElement> & {
+		name: string;
+		label?: string;
+		placehoder?: string;
+		textarea?: boolean;
+	};
 
 const inputTypeMap = (name: string): string => {
 	if (name.includes('password')) return 'password';
@@ -19,12 +21,18 @@ const inputTypeMap = (name: string): string => {
 	else return 'text';
 };
 
-const InputField: FC<InputFieldProps> = ({ label, size, ...props }) => {
+const InputField: FC<InputFieldProps> = ({
+	label,
+	size,
+	textarea,
+	...props
+}) => {
 	const [field, { error }] = useField(props);
+	const InputComponent = textarea ? Textarea : Input;
 	return (
 		<FormControl isInvalid={!!error}>
 			<FormLabel htmlFor={field.name}>{label ?? props.name}</FormLabel>
-			<Input
+			<InputComponent
 				{...field}
 				{...props}
 				type={inputTypeMap(props.name)}

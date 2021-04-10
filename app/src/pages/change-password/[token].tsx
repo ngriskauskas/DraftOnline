@@ -10,7 +10,7 @@ import Conditional from '../../components/Conditional';
 import { toErrorMap } from '../../utils/toErrorMap';
 import router from 'next/router';
 
-const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
+const ChangePassword: NextPage = () => {
 	const [, changePassword] = useChangePasswordMutation();
 	const [isTokenExpired, setTokenExpired] = useState(false);
 	return (
@@ -18,7 +18,10 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
 			inputFields={{ password: '' }}
 			submitText='Change Password'
 			onSubmit={async ({ password }, { setErrors }) => {
-				const response = await changePassword({ token, password });
+				const response = await changePassword({
+					token: (router.query.token as string) ?? '',
+					password,
+				});
 				if (response.error) {
 					const errors = toErrorMap(response.error, 'password');
 					setErrors(errors);
@@ -38,10 +41,6 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
 		/>
 	);
 };
-
-ChangePassword.getInitialProps = ({ query }) => ({
-	token: query.token as string,
-});
 
 export default withUrqlClient(createUrqlClient)(
 	(ChangePassword as unknown) as NextComponentType

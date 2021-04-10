@@ -1,13 +1,17 @@
 import { withUrqlClient } from 'next-urql';
-import NavBar from '../components/NavBar';
+import Layout from '../components/Layout';
 import { createUrqlClient } from '../utils/createUrqlClient';
+import { Link } from '@chakra-ui/layout';
+import React from 'react';
+import NextLink from 'next/link';
 
 const Index = () => {
 	return (
-		<>
-			<NavBar />
-			<div>Hello wolrd</div>
-		</>
+		<Layout variant='regular'>
+			<NextLink href='/create-post'>
+				<Link> create post</Link>
+			</NextLink>
+		</Layout>
 	);
 };
 export default withUrqlClient(createUrqlClient)(Index);

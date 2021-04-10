@@ -1,8 +1,7 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC } from 'react';
 
 interface ConditionalProps {
 	showing: boolean;
-	children: ReactNode;
 }
 
 const Conditional: FC<ConditionalProps> = ({ showing, children }) =>
