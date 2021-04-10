@@ -1,6 +1,5 @@
 import { withUrqlClient } from 'next-urql';
 import React, { FC, useState } from 'react';
-import Conditional from '../components/Conditional';
 import InputForm from '../components/InputForm';
 import Wrapper from '../components/Wrapper';
 import { useForgotPasswordMutation } from '../generated/graphql';
