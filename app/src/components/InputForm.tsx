@@ -9,6 +9,7 @@ interface FormProps {
 	inputFields: FormikValues;
 	submitText: string;
 	submissionComponent?: ReactNode;
+	responseComponent?: ReactNode;
 	onSubmit: (
 		values: FormikValues,
 		formikHelpers: FormikHelpers<FormikValues>
@@ -19,6 +20,7 @@ const InputForm: FC<FormProps> = ({
 	inputFields,
 	submitText,
 	submissionComponent,
+	responseComponent,
 	onSubmit,
 }: FormProps) => {
 	return (
