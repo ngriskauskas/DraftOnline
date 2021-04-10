@@ -149,6 +149,7 @@ export class UserResolver {
 		}
 		await User.update(userId, { password: await hash(input.password) });
 		const user = await User.findOneOrFail(userId);
+		redis.del(FORGET_PASSWORD_PREFIX + input.token);
 		req.session.userId = user.id;
 		return user;
 	}

@@ -1,46 +1,41 @@
-import { Box, Button } from '@chakra-ui/react';
-import { Formik, Form } from 'formik';
 import { NextPage } from 'next';
+import NextLink from 'next/link';
 import { withUrqlClient, NextComponentType } from 'next-urql';
-import router from 'next/router';
-import React, { FC } from 'react';
-import InputField from '../../components/InputField';
-import Wrapper from '../../components/Wrapper';
+import React, { useState } from 'react';
 import { useChangePasswordMutation } from '../../generated/graphql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
+import InputForm from '../../components/InputForm';
+import { Link } from '@chakra-ui/react';
+import Conditional from '../../components/Conditional';
 import { toErrorMap } from '../../utils/toErrorMap';
+import router from 'next/router';
 
 const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
 	const [, changePassword] = useChangePasswordMutation();
+	const [isTokenExpired, setTokenExpired] = useState(false);
 	return (
-		<Wrapper variant='small'>
-			<Formik
-				initialValues={{ password: '' }}
-				onSubmit={async (values, { setErrors }) => {
-					const response = await changePassword({ token, ...values });
-					if (response.error) {
-						setErrors(toErrorMap(response.error, 'password'));
-					} else {
-						router.push('/');
-					}
-				}}>
-				{({ isSubmitting }) => (
-					<Form>
-						<InputField
-							name='password'
-							label='New Password'
-							type='password'
-						/>
-
-						<Box mt={4}>
-							<Button type='submit' isLoading={isSubmitting}>
-								Change Password
-							</Button>
-						</Box>
-					</Form>
-				)}
-			</Formik>
-		</Wrapper>
+		<InputForm
+			inputFields={{ password: '' }}
+			submitText='Change Password'
+			onSubmit={async ({ password }, { setErrors }) => {
+				const response = await changePassword({ token, password });
+				if (response.error) {
+					const errors = toErrorMap(response.error, 'password');
+					setErrors(errors);
+					if (errors['password'] === 'Change Password Token Expired')
+						setTokenExpired(true);
+				} else {
+					router.push('/');
+				}
+			}}
+			submissionComponent={
+				<Conditional showing={isTokenExpired}>
+					<NextLink href='/forgot-password'>
+						<Link>Back to Forgot Password</Link>
+					</NextLink>
+				</Conditional>
+			}
+		/>
 	);
 };
 
