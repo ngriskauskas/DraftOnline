@@ -1,3 +1,4 @@
+import path from 'path';
 import { ConnectionOptions } from 'typeorm';
 import { __dbPassword__ } from './constants';
 
@@ -11,7 +12,7 @@ const config: ConnectionOptions = {
 	logging: false,
 	synchronize: true,
 	entities: ['./dist/entities/*.js'],
-	migrations: ['dist/migrations/*.js'],
+	migrations: [path.join(__dirname, './migrations/*')],
 };
 
 export default config;

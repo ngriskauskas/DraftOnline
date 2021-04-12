@@ -8,10 +8,15 @@ import {
 	Field,
 	Ctx,
 	UseMiddleware,
+	Int,
+	FieldResolver,
+	Root,
 } from 'type-graphql';
 import { MyContext } from '../types';
 import { isAuth } from '../middlware/isAuth';
 import { Length } from 'class-validator';
+import { LessThan } from 'typeorm';
+import { Upvote } from 'src/entities/Upvote';
 
 @InputType()
 class PostInput {
@@ -24,11 +29,39 @@ class PostInput {
 	text: string;
 }
 
-@Resolver()
+@InputType()
+class UpvoteInput {
+	@Field()
+	//TODO VALIDATE for - 1/ 1 using @Matches, regex
+	value: number;
+
+	@Field()
+	postId: number;
+}
+
+@Resolver(Post)
 export class PostResolver {
+	@FieldResolver(() => String)
+	textSnippet(@Root() root: Post) {
+		return root.text.slice(0, 100) + ' ...';
+	}
+
 	@Query(() => [Post])
-	posts(): Promise<Post[]> {
-		return Post.find();
+	async posts(
+		@Arg('limit', () => Int) limit: number,
+		@Arg('cursor', () => String, {
+			nullable: true,
+		})
+		cursor: string | null
+	): Promise<Post[]> {
+		return Post.find({
+			relations: ['author'],
+			where: cursor
+				? { createdAt: LessThan(new Date(parseInt(cursor))) }
+				: {},
+			order: { createdAt: 'DESC' },
+			take: Math.min(limit, 50),
+		});
 	}
 
 	@Query(() => Post, { nullable: true })
@@ -64,6 +97,22 @@ export class PostResolver {
 	@Mutation(() => Post, { nullable: true })
 	async deletePost(@Arg('id') id: number): Promise<boolean> {
 		await Post.delete(id);
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	@UseMiddleware(isAuth)
+	async vote(
+		@Arg('postId', () => Int) postId: number,
+		@Arg('value', () => Int) value: 1 | -1,
+		@Ctx() { req }: MyContext
+	) {
+		const { userId } = req.session;
+		Upvote.insert({
+			userId,
+			postId,
+			value,
+		});
 		return true;
 	}
 }

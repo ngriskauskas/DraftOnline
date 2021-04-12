@@ -1,6 +1,11 @@
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
 import router from 'next/router';
-import { dedupExchange, Exchange, fetchExchange } from 'urql';
+import {
+	dedupExchange,
+	fetchExchange,
+	stringifyVariables,
+	errorExchange,
+} from 'urql';
 import { pipe, tap } from 'wonka';
 import {
 	LoginMutation,
@@ -10,16 +15,27 @@ import {
 	RegisterMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
+import { devtoolsExchange } from '@urql/devtools';
 
-const errorExchange: Exchange = ({ forward }) => (ops$) => {
-	return pipe(
-		forward(ops$),
-		tap(({ error }) => {
-			if (error?.message.includes('Not Logged In')) {
-				router.replace('/login');
-			}
-		})
-	);
+const cursorPagination = (): Resolver => {
+	return (parent, fieldArgs, cache, info) => {
+		const { parentKey, fieldName } = info;
+		const fieldInfos = cache
+			.inspectFields(parentKey)
+			.filter((info) => info.fieldName === fieldName);
+
+		if (fieldInfos.length === 0) {
+			return undefined;
+		}
+		info.partial = !cache.resolve(
+			parentKey,
+			`${fieldName}(${stringifyVariables(fieldArgs)})`
+		);
+
+		return fieldInfos.flatMap((info) =>
+			cache.resolve(parentKey, info.fieldKey)
+		);
+	};
 };
 
 export const createUrqlClient = (ssrExchange: any) => {
@@ -29,8 +45,14 @@ export const createUrqlClient = (ssrExchange: any) => {
 			credentials: 'include' as const,
 		},
 		exchanges: [
+			devtoolsExchange,
 			dedupExchange,
 			cacheExchange({
+				resolvers: {
+					Query: {
+						posts: cursorPagination(),
+					},
+				},
 				updates: {
 					Mutation: {
 						login: (_result, args, cache, info) => {
@@ -68,7 +90,13 @@ export const createUrqlClient = (ssrExchange: any) => {
 					},
 				},
 			}),
-			errorExchange,
+			errorExchange({
+				onError(error) {
+					if (error?.message.includes('Not Logged In')) {
+						router.replace('/login');
+					}
+				},
+			}),
 			ssrExchange,
 			fetchExchange,
 		],

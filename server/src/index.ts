@@ -13,8 +13,8 @@ import config from './ormconfig';
 import cors from 'cors';
 
 const main = async () => {
-	await createConnection(config);
-
+	const conn = await createConnection(config);
+	await conn.runMigrations();
 	const app = express();
 
 	const RedisStore = connectRedis(session);
