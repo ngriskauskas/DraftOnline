@@ -3,9 +3,7 @@ mutation CreatePost($title: String!, $text: String!) {
 		id
 		title
 		text
-		points
 		createdAt
 		updatedAt
-		authorId
 	}
 }

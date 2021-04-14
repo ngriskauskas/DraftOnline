@@ -4,6 +4,9 @@ query Posts($limit: Int!, $cursor: String) {
 		createdAt
 		title
 		textSnippet
-		authorId
+		author {
+			id
+			username
+		}
 	}
 }

@@ -14,9 +14,9 @@ import {
 } from 'type-graphql';
 import { MyContext } from '../types';
 import { isAuth } from '../middlware/isAuth';
-import { Length } from 'class-validator';
+import { IsInt, Length, Max, Min } from 'class-validator';
 import { LessThan } from 'typeorm';
-import { Upvote } from 'src/entities/Upvote';
+import { Upvote } from '../entities/Upvote';
 
 @InputType()
 class PostInput {
@@ -32,7 +32,9 @@ class PostInput {
 @InputType()
 class UpvoteInput {
 	@Field()
-	//TODO VALIDATE for - 1/ 1 using @Matches, regex
+	@Min(-1)
+	@Max(1)
+	@IsInt()
 	value: number;
 
 	@Field()
@@ -55,7 +57,7 @@ export class PostResolver {
 		cursor: string | null
 	): Promise<Post[]> {
 		return Post.find({
-			relations: ['author'],
+			relations: ['author', 'upvotes'],
 			where: cursor
 				? { createdAt: LessThan(new Date(parseInt(cursor))) }
 				: {},
@@ -65,8 +67,10 @@ export class PostResolver {
 	}
 
 	@Query(() => Post, { nullable: true })
-	post(@Arg('id') id: number): Promise<Post | undefined> {
-		return Post.findOne(id);
+	async post(@Arg('id') id: number): Promise<Post | undefined> {
+		return Post.findOne(id, {
+			relations: ['author', 'upvotes'],
+		});
 	}
 
 	@Mutation(() => Post)
@@ -102,17 +106,9 @@ export class PostResolver {
 
 	@Mutation(() => Boolean)
 	@UseMiddleware(isAuth)
-	async vote(
-		@Arg('postId', () => Int) postId: number,
-		@Arg('value', () => Int) value: 1 | -1,
-		@Ctx() { req }: MyContext
-	) {
+	async vote(@Arg('input') input: UpvoteInput, @Ctx() { req }: MyContext) {
 		const { userId } = req.session;
-		Upvote.insert({
-			userId,
-			postId,
-			value,
-		});
+		Upvote.insert({ userId, postId: input.postId, value: input.value });
 		return true;
 	}
 }

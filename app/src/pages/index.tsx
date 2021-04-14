@@ -6,17 +6,21 @@ import NextLink from 'next/link';
 import { usePostsQuery } from '../generated/graphql';
 import { Button } from '@chakra-ui/button';
 import { usePagination } from '../utils/usePagination';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Index = () => {
 	const [cursor, setCursor] = useState(null as null | string);
-	const [{ data, fetching }] = usePostsQuery({
+	const [{ data }] = usePostsQuery({
 		variables: {
-			limit: 50,
+			limit: 25,
 			cursor,
 		},
 	});
-	const hasMore = usePagination({ data, fetching });
+
+	usePagination(() => {
+		if (data) setCursor(data.posts[data.posts.length - 1].createdAt);
+	});
+
 	return (
 		<Layout variant='regular'>
 			<Flex align='center'>
@@ -27,28 +31,14 @@ const Index = () => {
 			</Flex>
 			<Stack mt={2}>
 				{data &&
-					data.posts.map((post: any) => (
+					data.posts.map((post) => (
 						<Box key={post.id} p={5} shadow='md' borderWidth='1px'>
 							<Heading fontSize='xl'>{post.title}</Heading>
+							{post.author.username}
 							<Text mt={4}>{post.textSnippet}</Text>
 						</Box>
 					))}
 			</Stack>
-			{data && hasMore && (
-				<Flex>
-					<Button
-						onClick={async () => {
-							setCursor(
-								data.posts[data.posts.length - 1].createdAt
-							);
-						}}
-						isLoading={fetching}
-						m='auto'
-						my={8}>
-						load more
-					</Button>
-				</Flex>
-			)}
 		</Layout>
 	);
 };

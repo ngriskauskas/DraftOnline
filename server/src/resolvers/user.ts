@@ -55,6 +55,8 @@ export class ChangePasswordInput {
 export class UserResolver {
 	@Query(() => User, { nullable: true })
 	me(@Ctx() { req }: MyContext) {
+		console.log('IDJKDFJKDJF', req.session.userId);
+
 		if (!req.session.userId) {
 			return null;
 		}
@@ -96,6 +98,8 @@ export class UserResolver {
 			throw new Error('Incorrect Email or Password');
 
 		req.session.userId = user.id;
+		console.log('login', req.session.userId);
+
 		return user;
 	}
 
