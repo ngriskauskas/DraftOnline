@@ -31,13 +31,13 @@ class PostInput {
 
 @InputType()
 class UpvoteInput {
-	@Field()
+	@Field(() => Int)
 	@Min(-1)
 	@Max(1)
 	@IsInt()
 	value: number;
 
-	@Field()
+	@Field(() => Int)
 	postId: number;
 }
 
@@ -46,6 +46,12 @@ export class PostResolver {
 	@FieldResolver(() => String)
 	textSnippet(@Root() root: Post) {
 		return root.text.slice(0, 100) + ' ...';
+	}
+
+	@FieldResolver(() => Upvote, { nullable: true })
+	async upvote(@Root() { id }: Post, @Ctx() { req }: MyContext) {
+		const { userId } = req.session;
+		return Upvote.findOne({ where: { postId: id, userId } });
 	}
 
 	@Query(() => [Post])
@@ -58,9 +64,7 @@ export class PostResolver {
 	): Promise<Post[]> {
 		return Post.find({
 			relations: ['author', 'upvotes'],
-			where: cursor
-				? { createdAt: LessThan(new Date(parseInt(cursor))) }
-				: {},
+			where: cursor ? { createdAt: LessThan(new Date(parseInt(cursor))) } : {},
 			order: { createdAt: 'DESC' },
 			take: Math.min(limit, 50),
 		});
@@ -75,10 +79,7 @@ export class PostResolver {
 
 	@Mutation(() => Post)
 	@UseMiddleware(isAuth)
-	async createPost(
-		@Arg('input') { title, text }: PostInput,
-		@Ctx() { req }: MyContext
-	): Promise<Post> {
+	async createPost(@Arg('input') { title, text }: PostInput, @Ctx() { req }: MyContext): Promise<Post> {
 		return Post.create({
 			title,
 			text,
@@ -87,10 +88,7 @@ export class PostResolver {
 	}
 
 	@Mutation(() => Post, { nullable: true })
-	async updatePost(
-		@Arg('id') id: number,
-		@Arg('input') { title }: PostInput
-	): Promise<Post> {
+	async updatePost(@Arg('id') id: number, @Arg('input') { title }: PostInput): Promise<Post> {
 		const post = await Post.findOneOrFail(id);
 		if (title) {
 			await Post.update({ id }, { title });
@@ -107,8 +105,29 @@ export class PostResolver {
 	@Mutation(() => Boolean)
 	@UseMiddleware(isAuth)
 	async vote(@Arg('input') input: UpvoteInput, @Ctx() { req }: MyContext) {
-		const { userId } = req.session;
-		Upvote.insert({ userId, postId: input.postId, value: input.value });
+		const userId = req.session.userId as number;
+		let upvote;
+		upvote = await Upvote.findOne({
+			where: { userId, postId: input.postId },
+		});
+
+		const post = await Post.findOneOrFail(input.postId);
+
+		if (!upvote) {
+			upvote = new Upvote();
+			upvote.postId = input.postId;
+			upvote.userId = userId;
+			upvote.value = input.value;
+			post.points += input.value;
+			upvote.save();
+			post.save();
+		} else if (upvote.value !== input.value) {
+			post.points -= upvote.value;
+			post.points += input.value;
+			upvote.value = input.value;
+			upvote.save();
+			post.save();
+		}
 		return true;
 	}
 }

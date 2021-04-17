@@ -4,9 +4,9 @@ import { createUrqlClient } from '../utils/createUrqlClient';
 import { Link, Stack, Text, Heading, Box, Flex } from '@chakra-ui/layout';
 import NextLink from 'next/link';
 import { usePostsQuery } from '../generated/graphql';
-import { Button } from '@chakra-ui/button';
 import { usePagination } from '../utils/usePagination';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import UpvoteSection from '../components/UpvoteSection';
 
 const Index = () => {
 	const [cursor, setCursor] = useState(null as null | string);
@@ -33,13 +33,18 @@ const Index = () => {
 				{data &&
 					data.posts.map((post) => (
 						<Box key={post.id} p={5} shadow='md' borderWidth='1px'>
-							<Heading fontSize='xl'>{post.title}</Heading>
-							{post.author.username}
-							<Text mt={4}>{post.textSnippet}</Text>
+							<Flex>
+								<UpvoteSection post={post} />
+								<Box>
+									<Heading fontSize='xl'>{post.title}</Heading>
+									{post.author.username}
+									<Text mt={4}>{post.textSnippet}</Text>
+								</Box>
+							</Flex>
 						</Box>
 					))}
 			</Stack>
 		</Layout>
 	);
 };
-export default withUrqlClient(createUrqlClient)(Index);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index);

@@ -8,12 +8,10 @@ import { isServer } from '../utils/isServer';
 interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
-	const [{ data, fetching }] = useMeQuery({
-		pause: isServer(),
-	});
+	const [{ data, fetching }] = useMeQuery();
 	const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 	let userInfoBody = null;
-	if (isServer() || fetching) {
+	if (fetching) {
 	} else if (!data?.me) {
 		userInfoBody = (
 			<>
@@ -31,10 +29,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 		userInfoBody = (
 			<Flex>
 				<Box mr={2}>{data.me.username}</Box>
-				<Button
-					variant='link'
-					onClick={() => logout()}
-					isLoading={logoutFetching}>
+				<Button variant='link' onClick={() => logout()} isLoading={logoutFetching}>
 					Logout
 				</Button>
 			</Flex>

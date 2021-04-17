@@ -1,14 +1,6 @@
 import { User } from '../entities/User';
 import { MyContext } from '../types';
-import {
-	Arg,
-	Ctx,
-	Field,
-	InputType,
-	Mutation,
-	Query,
-	Resolver,
-} from 'type-graphql';
+import { Arg, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql';
 import { hash, verify } from 'argon2';
 import { Length, IsEmail } from 'class-validator';
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants';
@@ -55,19 +47,14 @@ export class ChangePasswordInput {
 export class UserResolver {
 	@Query(() => User, { nullable: true })
 	me(@Ctx() { req }: MyContext) {
-		console.log('IDJKDFJKDJF', req.session.userId);
-
 		if (!req.session.userId) {
 			return null;
 		}
-		return User.findOne(req.session.userId);
+		return User.findOne(req.session.userId, { relations: ['upvotes'] });
 	}
 
 	@Mutation(() => User)
-	async register(
-		@Arg('input') input: UserRegisterInput,
-		@Ctx() { req }: MyContext
-	): Promise<User> {
+	async register(@Arg('input') input: UserRegisterInput, @Ctx() { req }: MyContext): Promise<User> {
 		try {
 			const user = await User.create({
 				username: input.username,
@@ -84,22 +71,16 @@ export class UserResolver {
 	}
 
 	@Mutation(() => User)
-	async login(
-		@Arg('input') input: UserLoginInput,
-		@Ctx() { req }: MyContext
-	): Promise<User> {
+	async login(@Arg('input') input: UserLoginInput, @Ctx() { req }: MyContext): Promise<User> {
 		const user = await User.findOne({
 			where: { email: input.email },
 		});
 		if (!user) {
 			throw new Error('Incorrect Email or Password');
 		}
-		if (!(await verify(user.password, input.password)))
-			throw new Error('Incorrect Email or Password');
+		if (!(await verify(user.password, input.password))) throw new Error('Incorrect Email or Password');
 
 		req.session.userId = user.id;
-		console.log('login', req.session.userId);
-
 		return user;
 	}
 
@@ -117,10 +98,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => Boolean)
-	async forgotPassword(
-		@Arg('email') email: string,
-		@Ctx() { redis }: MyContext
-	): Promise<Boolean> {
+	async forgotPassword(@Arg('email') email: string, @Ctx() { redis }: MyContext): Promise<Boolean> {
 		const user = await User.findOne({
 			where: { email },
 		});
@@ -129,24 +107,13 @@ export class UserResolver {
 		}
 		const token = v4();
 
-		await redis.set(
-			FORGET_PASSWORD_PREFIX + token,
-			user.id,
-			'ex',
-			1000 * 60 * 60
-		);
-		await sendEmail(
-			email,
-			`<a href="http://localhost:3000/change-password/${token}">Reset Password</a>`
-		);
+		await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60);
+		await sendEmail(email, `<a href="http://localhost:3000/change-password/${token}">Reset Password</a>`);
 		return true;
 	}
 
 	@Mutation(() => User)
-	async changePassword(
-		@Arg('input') input: ChangePasswordInput,
-		@Ctx() { redis, req }: MyContext
-	): Promise<User> {
+	async changePassword(@Arg('input') input: ChangePasswordInput, @Ctx() { redis, req }: MyContext): Promise<User> {
 		const userId = await redis.get(FORGET_PASSWORD_PREFIX + input.token);
 		if (!userId) {
 			throw new Error('Change Password Token Expired');
