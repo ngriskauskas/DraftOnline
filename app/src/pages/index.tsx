@@ -36,7 +36,11 @@ const Index = () => {
 							<Flex>
 								<UpvoteSection post={post} />
 								<Box>
-									<Heading fontSize='xl'>{post.title}</Heading>
+									<NextLink href='/post/[id]' as={`/post/${post.id}`}>
+										<Link>
+											<Heading fontSize='xl'>{post.title}</Heading>
+										</Link>
+									</NextLink>
 									{post.author.username}
 									<Text mt={4}>{post.textSnippet}</Text>
 								</Box>
@@ -47,4 +51,4 @@ const Index = () => {
 		</Layout>
 	);
 };
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default withUrqlClient(createUrqlClient)(Index);

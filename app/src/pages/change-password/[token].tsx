@@ -25,8 +25,7 @@ const ChangePassword: NextPage = () => {
 				if (response.error) {
 					const errors = toErrorMap(response.error, 'password');
 					setErrors(errors);
-					if (errors['password'] === 'Change Password Token Expired')
-						setTokenExpired(true);
+					if (errors['password'] === 'Change Password Token Expired') setTokenExpired(true);
 				} else {
 					router.push('/');
 				}
@@ -42,6 +41,4 @@ const ChangePassword: NextPage = () => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient)(
-	(ChangePassword as unknown) as NextComponentType
-);
+export default withUrqlClient(createUrqlClient)((ChangePassword as unknown) as NextComponentType);
