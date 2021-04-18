@@ -1,7 +1,14 @@
 import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
 import router from 'next/router';
-import { dedupExchange, fetchExchange, stringifyVariables, errorExchange, gql } from 'urql';
 import {
+	dedupExchange,
+	fetchExchange,
+	stringifyVariables,
+	errorExchange,
+	gql,
+} from 'urql';
+import {
+	DeletePostMutationVariables,
 	LoginMutation,
 	LogoutMutation,
 	MeDocument,
@@ -19,14 +26,21 @@ import { isServer } from './isServer';
 const cursorPagination = (): Resolver => {
 	return (parent, fieldArgs, cache, info) => {
 		const { parentKey, fieldName } = info;
-		const fieldInfos = cache.inspectFields(parentKey).filter((info) => info.fieldName === fieldName);
+		const fieldInfos = cache
+			.inspectFields(parentKey)
+			.filter((info) => info.fieldName === fieldName);
 
 		if (fieldInfos.length === 0) {
 			return undefined;
 		}
-		info.partial = !cache.resolve(parentKey, `${fieldName}(${stringifyVariables(fieldArgs)})`);
+		info.partial = !cache.resolve(
+			parentKey,
+			`${fieldName}(${stringifyVariables(fieldArgs)})`
+		);
 
-		return fieldInfos.flatMap((info) => cache.resolve(parentKey, info.fieldKey));
+		return fieldInfos.flatMap((info) =>
+			cache.resolve(parentKey, info.fieldKey)
+		);
 	};
 };
 
@@ -35,7 +49,9 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 		url: 'http://localhost:4000/graphql',
 		fetchOptions: {
 			credentials: 'include' as const,
-			headers: isServer() ? { cookie: ctx?.req?.headers?.cookie } ?? undefined : undefined,
+			headers: isServer()
+				? { cookie: ctx?.req?.headers?.cookie } ?? undefined
+				: undefined,
 		},
 		exchanges: [
 			devtoolsExchange,
@@ -62,6 +78,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 									};
 								}
 							);
+							cache
+								.inspectFields('Query')
+								.filter((info) => info.fieldName === 'posts')
+								.forEach((info) => {
+									cache.invalidate('Query', 'posts', info.arguments ?? {});
+								});
 						},
 						register: (_result, args, cache, info) => {
 							betterUpdateQuery<RegisterMutation, MeQuery>(
@@ -76,9 +98,14 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 							);
 						},
 						logout: (_result, args, cache, info) => {
-							betterUpdateQuery<LogoutMutation, MeQuery>(cache, { query: MeDocument }, _result, () => ({
-								me: null,
-							}));
+							betterUpdateQuery<LogoutMutation, MeQuery>(
+								cache,
+								{ query: MeDocument },
+								_result,
+								() => ({
+									me: null,
+								})
+							);
 						},
 						createPost: (_result, args, cache, info) => {
 							cache
@@ -90,7 +117,9 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 						},
 						vote: (_result, args, cache, info) => {
 							const { postId, value } = args.input as VoteMutationVariables;
-							const post = cache.readFragment(VotePostFragmentDoc, { id: postId } as VotePostFragment);
+							const post = cache.readFragment(VotePostFragmentDoc, {
+								id: postId,
+							} as VotePostFragment);
 							if (post) {
 								let newPoints;
 								let newValue;
@@ -112,6 +141,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 									upvote: { __typename: 'Upvote', value: newValue },
 								});
 							}
+						},
+						deletePost: (_result, args, cache, info) => {
+							cache.invalidate({
+								__typename: 'Post',
+								id: (args as DeletePostMutationVariables).id,
+							});
 						},
 					},
 				},

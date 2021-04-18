@@ -10,7 +10,9 @@ interface PostProps {}
 
 const Post: FC<PostProps> = ({}) => {
 	const router = useRouter();
-	const [{ data, fetching }] = usePostQuery({ variables: { id: parseInt(router.query.id as string) } });
+	const [{ data, fetching }] = usePostQuery({
+		variables: { id: parseInt(router.query.id as string) },
+	});
 
 	return (
 		<Layout variant='regular'>
