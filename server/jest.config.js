@@ -1,6 +1,10 @@
 module.exports = {
 	preset: 'ts-jest',
-	testEnvironment: 'node',
 	collectCoverage: true,
-	collectCoverageFrom: ['src/resolvers/*.ts'],
+	collectCoverageFrom: ['src/resolvers/**/*.ts'],
+	transform: {
+		'^.+\\.(ts|tsx)$': 'ts-jest',
+	},
+	verbose: true,
+	reporters: ['jest-progress-bar-reporter'],
 };

@@ -1,26 +1,34 @@
 import { graphql, GraphQLSchema } from 'graphql';
 import { buildSchema, Maybe } from 'type-graphql';
-import { PostResolver } from '../../src/resolvers/post';
-import { UserResolver } from '../../src/resolvers/user';
-
+import { Resolvers } from '../../src/config/constants';
 interface Options {
 	source: string;
 	variableValues?: Maybe<{
 		[key: string]: any;
 	}>;
+	userId?: number;
 }
 
 let schema: GraphQLSchema;
 
-export const gCall = async ({ source, variableValues }: Options) => {
+//Maybe use for unit tests?
+export const gCall = async ({ source, variableValues, userId }: Options) => {
 	if (!schema) {
 		schema = await buildSchema({
-			resolvers: [PostResolver, UserResolver],
+			resolvers: Resolvers,
 		});
 	}
 	return graphql({
 		schema,
 		source,
 		variableValues,
+		contextValue: {
+			req: {
+				session: {
+					userId,
+				},
+			},
+			res: {},
+		},
 	});
 };

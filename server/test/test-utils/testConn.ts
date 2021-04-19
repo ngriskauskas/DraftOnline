@@ -1,17 +1,15 @@
-import { ConnectionOptions, createConnection } from 'typeorm';
+import { ConnectionOptions } from 'typeorm';
+import ormConfig from '../../src/config/ormconfig';
 import { Post } from '../../src/entities/Post';
+import { Upvote } from '../../src/entities/Upvote';
 import { User } from '../../src/entities/User';
-import config from '../../src/ormconfig';
 
-export const testConn = (drop: boolean = false) => {
-	const testConfig: ConnectionOptions = {
-		...config,
-		type: 'postgres',
-		database: 'draft-online-test',
-		synchronize: drop,
-		dropSchema: drop,
-		logging: false,
-		entities: [Post, User],
-	};
-	return createConnection(testConfig);
+export const testOrmConfig: ConnectionOptions = {
+	...ormConfig,
+	type: 'postgres',
+	database: 'draft-online-test',
+	synchronize: true,
+	dropSchema: true,
+	logging: false,
+	entities: [Post, User, Upvote],
 };

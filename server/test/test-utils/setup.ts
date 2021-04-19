@@ -1,3 +1,6 @@
-import { testConn } from './testConn';
+//Workaround for ts jest environment setup
+require('ts-node/register');
 
-testConn(true).then(() => process.exit());
+const setup = (): void => {};
+
+export default setup;
