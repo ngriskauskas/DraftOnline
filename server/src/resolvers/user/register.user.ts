@@ -34,10 +34,8 @@ export class RegisterResolver {
 			}).save();
 			req.session.userId = user.id;
 			return user;
-		} catch (err) {
-			if (err.message.includes('duplicate')) {
-				throw new Error('User Already Exists');
-			} else throw err;
+		} catch {
+			throw new Error('User Already Exists');
 		}
 	}
 }

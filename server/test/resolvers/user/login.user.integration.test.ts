@@ -1,18 +1,11 @@
-import { hash } from 'argon2';
-import { User } from '../../../src/entities/User';
 import { Express } from 'express';
 import { closeTestServer, initTestServer } from '../../test-utils/testServer';
-import supertest from 'supertest';
+import { createSession } from '../../test-utils/createSession';
+import { me } from '../../test-utils/me';
 
 let app: Express;
-let user: User;
 beforeAll(async () => {
 	app = await initTestServer();
-	user = await User.create({
-		username: 'username',
-		email: 'email@test.com',
-		password: await hash('1234'),
-	}).save();
 });
 
 afterAll(async () => {
@@ -27,31 +20,20 @@ mutation Login($email: String!, $password: String!){
     email
   }
 }`;
-//TODO Confirm user is actuall logged in afterwords, use me query?
-describe('login', () => {
+
+describe('User Mutation: Login', () => {
 	describe('when login info is valid', () => {
 		it('returns user', async () => {
-			const loginResponse = await supertest(app)
-				.post('/graphql')
-				.send({
-					query: loginMutation,
-					variables: {
-						email: 'email@test.com',
-						password: '1234',
-					},
-				})
-				.expect(200);
-
-			expect(loginResponse.body).toEqual({
-				data: {
-					login: { id: user.id, username: user.username, email: user.email },
-				},
-			});
+			const { session, user } = await createSession(app, true);
+			const { id, email, username } = user!;
+			expect(await me(session)).toEqual({ id, email, username });
 		});
 	});
+
 	describe('when email does not exist', () => {
 		it('returns error: incorrect email or password', async () => {
-			const loginResponse = await supertest(app)
+			const { session } = await createSession(app);
+			const loginResponse = await session
 				.post('/graphql')
 				.send({
 					query: loginMutation,
@@ -65,16 +47,19 @@ describe('login', () => {
 			expect(loginResponse.body.errors![0].message).toEqual(
 				'Incorrect Email or Password'
 			);
+			expect(await me(session)).toEqual(null);
 		});
 	});
+
 	describe('when password is wrong', () => {
 		it('returns error: incorrect email or password', async () => {
-			const loginResponse = await supertest(app)
+			const { session } = await createSession(app);
+			const loginResponse = await session
 				.post('/graphql')
 				.send({
 					query: loginMutation,
 					variables: {
-						email: 'email@missing.com',
+						email: 'email@test.com',
 						password: 'abcd',
 					},
 				})
@@ -83,6 +68,7 @@ describe('login', () => {
 			expect(loginResponse.body.errors![0].message).toEqual(
 				'Incorrect Email or Password'
 			);
+			expect(await me(session)).toEqual(null);
 		});
 	});
 });

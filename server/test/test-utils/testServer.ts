@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import { Connection, createConnection } from 'typeorm';
 import { createApp } from '../../src/config/server';
-import { testOrmConfig } from './testConn';
+import { testOrmConfig } from './testOrmConfig';
 
 let conn: Connection;
 let redis: Redis.Redis;

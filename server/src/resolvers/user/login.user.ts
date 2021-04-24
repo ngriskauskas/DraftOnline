@@ -27,11 +27,11 @@ export class LoginResolver {
 		});
 		if (!user) {
 			throw new Error('Incorrect Email or Password');
-		}
-		if (!(await verify(user.password, input.password)))
+		} else if (!(await verify(user.password, input.password))) {
 			throw new Error('Incorrect Email or Password');
-
-		req.session.userId = user.id;
-		return user;
+		} else {
+			req.session.userId = user.id;
+			return user;
+		}
 	}
 }

@@ -8,12 +8,9 @@ export class LogoutResolver {
 	@Mutation(() => Boolean)
 	async logout(@Ctx() { req, res }: Context): Promise<Boolean> {
 		return new Promise((resolve) =>
-			req.session.destroy((err) => {
-				if (err) resolve(false);
-				else {
-					res.clearCookie(COOKIE_NAME);
-					resolve(true);
-				}
+			req.session.destroy(() => {
+				res.clearCookie(COOKIE_NAME);
+				resolve(true);
 			})
 		);
 	}

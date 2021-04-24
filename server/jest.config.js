@@ -6,5 +6,4 @@ module.exports = {
 		'^.+\\.(ts|tsx)$': 'ts-jest',
 	},
 	verbose: true,
-	reporters: ['jest-progress-bar-reporter'],
 };
