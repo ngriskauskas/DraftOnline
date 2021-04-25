@@ -32,7 +32,7 @@ mutation ForgotPassword($email: String!) {
 	forgotPassword(email: $email) 
 }`;
 
-describe('User Mutation: Register', () => {
+describe('User Mutation: Change Password', () => {
 	describe('when forgot password token is valid', () => {
 		beforeEach(async () => {
 			await User.create({
