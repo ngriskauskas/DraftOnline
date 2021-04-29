@@ -3,4 +3,5 @@ module.exports = {
 		'^.+\\.tsx?$': 'babel-jest',
 	},
 	moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+	resetMocks: true,
 };
