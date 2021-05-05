@@ -19,13 +19,14 @@ const ChangePassword: NextPage = () => {
 			submitText='Change Password'
 			onSubmit={async ({ password }, { setErrors }) => {
 				const response = await changePassword({
-					token: (router.query.token as string) ?? '',
+					token: router.query.token as string,
 					password,
 				});
 				if (response.error) {
 					const errors = toErrorMap(response.error, 'password');
 					setErrors(errors);
-					if (errors['password'] === 'Change Password Token Expired') setTokenExpired(true);
+					if (errors['password'] === 'Change Password Token Expired')
+						setTokenExpired(true);
 				} else {
 					router.push('/');
 				}
@@ -41,4 +42,6 @@ const ChangePassword: NextPage = () => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient)((ChangePassword as unknown) as NextComponentType);
+export default withUrqlClient(createUrqlClient)(
+	(ChangePassword as unknown) as NextComponentType
+);
