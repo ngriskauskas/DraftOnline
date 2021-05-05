@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { useLoginMutation } from '../generated/graphql';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
@@ -8,9 +8,7 @@ import { Link } from '@chakra-ui/react';
 import { toErrorMap } from '../utils/toErrorMap';
 import router from 'next/router';
 
-interface loginProps {}
-
-const Login: FC<loginProps> = ({}) => {
+const Login: FC = ({}) => {
 	const [, login] = useLoginMutation();
 	return (
 		<InputForm

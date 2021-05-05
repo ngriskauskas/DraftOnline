@@ -1,0 +1,16 @@
+{
+  "env": {
+    "development": {
+      "presets": [
+        "next/babel"
+      ]
+    },
+    "test": {
+      "presets": [
+        "@babel/typescript",
+        "@babel/env",
+        "@babel/react"
+      ]
+    }
+  }
+}

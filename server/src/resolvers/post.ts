@@ -12,11 +12,12 @@ import {
 	FieldResolver,
 	Root,
 } from 'type-graphql';
-import { MyContext } from '../types';
+import { Context } from '../types';
 import { isAuth } from '../middlware/isAuth';
 import { IsInt, Length, Max, Min } from 'class-validator';
 import { LessThan } from 'typeorm';
 import { Upvote } from '../entities/Upvote';
+import { User } from '../entities/User';
 
 @InputType()
 class PostInput {
@@ -44,14 +45,19 @@ class UpvoteInput {
 @Resolver(Post)
 export class PostResolver {
 	@FieldResolver(() => String)
-	textSnippet(@Root() root: Post) {
-		return root.text.slice(0, 100) + ' ...';
+	textSnippet(@Root() { text }: Post) {
+		return text.slice(0, 100) + ' ...';
 	}
-
+	//Don't do this in the future, join tables should probably not be exposed like this
 	@FieldResolver(() => Upvote, { nullable: true })
-	async upvote(@Root() { id }: Post, @Ctx() { req }: MyContext) {
+	async upvote(@Root() { id }: Post, @Ctx() { req }: Context) {
 		const { userId } = req.session;
 		return Upvote.findOne({ where: { postId: id, userId } });
+	}
+
+	@FieldResolver(() => User)
+	async author(@Root() post: Post, @Ctx() { userLoader }: Context) {
+		return userLoader.load(post.authorId);
 	}
 
 	@Query(() => [Post])
@@ -63,7 +69,6 @@ export class PostResolver {
 		cursor: string | null
 	): Promise<Post[]> {
 		return Post.find({
-			relations: ['author', 'upvotes'],
 			where: cursor ? { createdAt: LessThan(new Date(parseInt(cursor))) } : {},
 			order: { createdAt: 'DESC' },
 			take: Math.min(limit, 50),
@@ -72,14 +77,15 @@ export class PostResolver {
 
 	@Query(() => Post, { nullable: true })
 	async post(@Arg('id', () => Int) id: number): Promise<Post | undefined> {
-		return Post.findOne(id, {
-			relations: ['author', 'upvotes'],
-		});
+		return Post.findOne(id);
 	}
 
 	@Mutation(() => Post)
 	@UseMiddleware(isAuth)
-	async createPost(@Arg('input') { title, text }: PostInput, @Ctx() { req }: MyContext): Promise<Post> {
+	async createPost(
+		@Arg('input') { title, text }: PostInput,
+		@Ctx() { req }: Context
+	): Promise<Post> {
 		return Post.create({
 			title,
 			text,
@@ -88,7 +94,10 @@ export class PostResolver {
 	}
 
 	@Mutation(() => Post, { nullable: true })
-	async updatePost(@Arg('id') id: number, @Arg('input') { title }: PostInput): Promise<Post> {
+	async updatePost(
+		@Arg('id', () => Int) id: number,
+		@Arg('input') { title }: PostInput
+	): Promise<Post> {
 		const post = await Post.findOneOrFail(id);
 		if (title) {
 			await Post.update({ id }, { title });
@@ -96,15 +105,19 @@ export class PostResolver {
 		return post;
 	}
 
-	@Mutation(() => Post, { nullable: true })
-	async deletePost(@Arg('id') id: number): Promise<boolean> {
-		await Post.delete(id);
+	@Mutation(() => Boolean, { nullable: true })
+	@UseMiddleware(isAuth)
+	async deletePost(
+		@Arg('id', () => Int) id: number,
+		@Ctx() { req }: Context
+	): Promise<boolean> {
+		await Post.delete({ id, authorId: req.session.userId });
 		return true;
 	}
 
 	@Mutation(() => Boolean)
 	@UseMiddleware(isAuth)
-	async vote(@Arg('input') input: UpvoteInput, @Ctx() { req }: MyContext) {
+	async vote(@Arg('input') input: UpvoteInput, @Ctx() { req }: Context) {
 		const userId = req.session.userId as number;
 		let upvote;
 		upvote = await Upvote.findOne({
