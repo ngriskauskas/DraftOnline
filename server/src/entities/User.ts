@@ -8,8 +8,8 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import { Post } from './Post';
-import { Upvote } from './Upvote';
+import { Game } from './Game';
+import { GameUser } from './GameUser';
 
 @ObjectType()
 @Entity()
@@ -37,9 +37,9 @@ export class User extends BaseEntity {
 	@Column()
 	password!: string;
 
-	@OneToMany(() => Post, (post) => post.author)
-	posts: Post[];
+	@OneToMany(() => Game, (game) => game.creator)
+	createdGames: Game[];
 
-	@OneToMany(() => Upvote, (upvote) => upvote.user)
-	upvotes: Upvote[];
+	@OneToMany(() => GameUser, (gameUser) => gameUser.user)
+	joinedGames: GameUser[];
 }

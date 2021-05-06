@@ -1,20 +1,20 @@
 import { ObjectType, Field, Int } from 'type-graphql';
 import {
-	BaseEntity,
-	Column,
-	CreateDateColumn,
 	Entity,
+	BaseEntity,
+	PrimaryGeneratedColumn,
+	CreateDateColumn,
+	UpdateDateColumn,
+	Column,
 	ManyToOne,
 	OneToMany,
-	PrimaryGeneratedColumn,
-	UpdateDateColumn,
 } from 'typeorm';
-import { Upvote } from './Upvote';
+import { GameUser } from './GameUser';
 import { User } from './User';
 
 @ObjectType()
 @Entity()
-export class Post extends BaseEntity {
+export class Game extends BaseEntity {
 	@Field(() => Int)
 	@PrimaryGeneratedColumn()
 	id!: number;
@@ -31,21 +31,13 @@ export class Post extends BaseEntity {
 	@Column()
 	title!: string;
 
-	@Field()
-	@Column()
-	text!: string;
-
 	@Field(() => User)
-	@ManyToOne(() => User, (user) => user.posts)
-	author: User;
+	@ManyToOne(() => User, (user) => user.createdGames)
+	creator: User;
 
 	@Column()
-	authorId: number;
+	creatorId: number;
 
-	@OneToMany(() => Upvote, (upvote) => upvote.post)
-	upvotes: Upvote[];
-
-	@Field(() => Int)
-	@Column({ default: 0 })
-	points: number;
+	@OneToMany(() => GameUser, (gameUser) => gameUser.game)
+	gameUsers: GameUser[];
 }
