@@ -3,7 +3,11 @@ import Layout from '../components/Layout';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { Link, Stack, Text, Heading, Box, Flex } from '@chakra-ui/layout';
 import NextLink from 'next/link';
-import { useDeletePostMutation, usePostsQuery } from '../generated/graphql';
+import {
+	useDeletePostMutation,
+	useGamesQuery,
+	usePostsQuery,
+} from '../generated/graphql';
 import { usePagination } from '../utils/usePagination';
 import { useState } from 'react';
 import UpvoteSection from '../components/UpvoteSection';
@@ -12,49 +16,38 @@ import { DeleteIcon } from '@chakra-ui/icons';
 
 const Index = () => {
 	const [cursor, setCursor] = useState(null as null | string);
-	const [{ data }] = usePostsQuery({
+	const [{ data }] = useGamesQuery({
 		variables: {
 			limit: 25,
 			cursor,
 		},
 	});
-	const [, deletePost] = useDeletePostMutation();
 
 	usePagination(() => {
-		if (data) setCursor(data.posts[data.posts.length - 1].createdAt);
+		if (data) setCursor(data.games[data.games.length - 1].createdAt);
 	});
 
 	return (
 		<Layout variant='regular'>
 			<Flex align='center'>
-				<Heading>Gardentopia</Heading>
+				<Heading>Draft Online</Heading>
 				<NextLink href='/create-post'>
-					<Link ml='auto'> create post</Link>
+					<Link ml='auto'> Create New Game</Link>
 				</NextLink>
 			</Flex>
 			<Stack mt={2}>
 				{data &&
-					data.posts.map((post) =>
-						!post ? null : (
-							<Box key={post.id} p={5} shadow='md' borderWidth='1px'>
+					data.games.map((game) =>
+						!game ? null : (
+							<Box key={game.id} p={5} shadow='md' borderWidth='1px'>
 								<Flex>
-									<UpvoteSection post={post} />
 									<Box flex={1}>
-										<NextLink href='/post/[id]' as={`/post/${post.id}`}>
+										<NextLink href='/game/[id]' as={`/game/${game.id}`}>
 											<Link>
-												<Heading fontSize='xl'>{post.title}</Heading>
+												<Heading fontSize='xl'>{game.title}</Heading>
 											</Link>
 										</NextLink>
-										{post.author.username}
-										<Flex>
-											<Text mt={4}>{post.textSnippet}</Text>
-											<IconButton
-												ml='auto'
-												colorScheme='red'
-												aria-label='Delete Post'
-												onClick={() => deletePost({ id: post.id })}
-												icon={<DeleteIcon />}></IconButton>
-										</Flex>
+										{game.creator.username}
 									</Box>
 								</Flex>
 							</Box>

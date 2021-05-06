@@ -19,17 +19,26 @@ export type ChangePasswordInput = {
   password: Scalars['String'];
 };
 
+export type Game = {
+  __typename?: 'Game';
+  id: Scalars['Int'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  title: Scalars['String'];
+  creator: User;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createPost: Post;
   updatePost?: Maybe<Post>;
   deletePost?: Maybe<Scalars['Boolean']>;
   vote: Scalars['Boolean'];
-  register: User;
+  changePassword: User;
+  forgotPassword: Scalars['Boolean'];
   login: User;
   logout: Scalars['Boolean'];
-  forgotPassword: Scalars['Boolean'];
-  changePassword: User;
+  register: User;
 };
 
 
@@ -54,13 +63,8 @@ export type MutationVoteArgs = {
 };
 
 
-export type MutationRegisterArgs = {
-  input: UserRegisterInput;
-};
-
-
-export type MutationLoginArgs = {
-  input: UserLoginInput;
+export type MutationChangePasswordArgs = {
+  input: ChangePasswordInput;
 };
 
 
@@ -69,8 +73,18 @@ export type MutationForgotPasswordArgs = {
 };
 
 
-export type MutationChangePasswordArgs = {
-  input: ChangePasswordInput;
+export type MutationLoginArgs = {
+  input: UserLoginInput;
+};
+
+
+export type MutationRegisterArgs = {
+  input: UserRegisterInput;
+};
+
+export type PaginationInput = {
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
 };
 
 export type Post = {
@@ -93,9 +107,15 @@ export type PostInput = {
 
 export type Query = {
   __typename?: 'Query';
+  games: Array<Game>;
   posts: Array<Post>;
   post?: Maybe<Post>;
   me?: Maybe<User>;
+};
+
+
+export type QueryGamesArgs = {
+  input: PaginationInput;
 };
 
 
@@ -265,6 +285,24 @@ export type VoteMutation = (
   & Pick<Mutation, 'vote'>
 );
 
+export type GamesQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GamesQuery = (
+  { __typename?: 'Query' }
+  & { games: Array<(
+    { __typename?: 'Game' }
+    & Pick<Game, 'id' | 'createdAt' | 'updatedAt' | 'title'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  )> }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -426,6 +464,24 @@ export const VoteDocument = gql`
 
 export function useVoteMutation() {
   return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
+};
+export const GamesDocument = gql`
+    query Games($limit: Int!, $cursor: String) {
+  games(input: {limit: $limit, cursor: $cursor}) {
+    id
+    createdAt
+    updatedAt
+    title
+    creator {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function useGamesQuery(options: Omit<Urql.UseQueryArgs<GamesQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GamesQuery>({ query: GamesDocument, ...options });
 };
 export const MeDocument = gql`
     query Me {

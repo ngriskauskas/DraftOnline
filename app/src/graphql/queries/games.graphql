@@ -1,0 +1,12 @@
+query Games($limit: Int!, $cursor: String) {
+	games(input: { limit: $limit, cursor: $cursor }) {
+		id
+		createdAt
+		updatedAt
+		title
+		creator {
+			id
+			username
+		}
+	}
+}
