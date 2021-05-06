@@ -9,6 +9,6 @@ export class MeResolver {
 		if (!req.session.userId) {
 			return null;
 		}
-		return User.findOne(req.session.userId, { relations: ['upvotes'] });
+		return User.findOne(req.session.userId);
 	}
 }
