@@ -3,7 +3,7 @@ import React from 'react';
 import Register from '../../src/pages/register';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useRegisterMutation } from '../../src/generated/graphql';
-import { mockMutation, mockErrorResponse } from '../test-utils/mockMutation';
+import { mockQuery, mockErrorResponse } from '../test-utils/mockQuery';
 import router from 'next/router';
 import { mocked } from 'ts-jest/utils';
 
@@ -15,7 +15,7 @@ jest.mock('next/router', () => ({
 let register: jest.Mock;
 let mockRouter: any;
 beforeEach(() => {
-	register = mockMutation(useRegisterMutation);
+	register = mockQuery({ query: useRegisterMutation });
 	mockRouter = mocked(router.push);
 });
 describe('register page', () => {

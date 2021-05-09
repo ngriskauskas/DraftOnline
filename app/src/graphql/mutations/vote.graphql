@@ -1,3 +1,0 @@
-mutation Vote($value: Int!, $postId: Int!) {
-	vote(input: { value: $value, postId: $postId })
-}

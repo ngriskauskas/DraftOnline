@@ -11,7 +11,7 @@ export class GameUser extends BaseEntity {
 	userId: number;
 
 	@Field(() => User)
-	@ManyToOne(() => User, (user) => user.joinedGames)
+	@ManyToOne(() => User, (user) => user.joinedGames, { onDelete: 'CASCADE' })
 	user: User;
 
 	@Field()

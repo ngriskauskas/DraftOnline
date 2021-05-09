@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { FC } from 'react';
 import Layout from '../../components/Layout';
 import { usePostQuery } from '../../generated/graphql';
-import { createUrqlClient } from '../../utils/createUrqlClient';
+import { createUrqlClient } from '../../gqlClient/createUrqlClient';
 
 interface PostProps {}
 

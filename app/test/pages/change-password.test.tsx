@@ -3,7 +3,7 @@ import React from 'react';
 import ChangePassword from '../../src/pages/change-password/[token]';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useChangePasswordMutation } from '../../src/generated/graphql';
-import { mockMutation, mockErrorResponse } from '../test-utils/mockMutation';
+import { mockErrorResponse, mockQuery } from '../test-utils/mockQuery';
 import router from 'next/router';
 import { mocked } from 'ts-jest/utils';
 
@@ -17,7 +17,7 @@ jest.mock('next/router', () => ({
 let changePassword: jest.Mock;
 let mockRouter: any;
 beforeEach(() => {
-	changePassword = mockMutation(useChangePasswordMutation);
+	changePassword = mockQuery({ query: useChangePasswordMutation });
 	mockRouter = mocked(router.push);
 });
 describe('change-password page', () => {

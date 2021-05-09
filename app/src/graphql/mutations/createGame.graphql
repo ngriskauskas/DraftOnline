@@ -1,0 +1,10 @@
+mutation CreateGame($title: String!) {
+	createGame(input: { title: $title }) {
+		id
+		title
+		creator {
+			id
+			username
+		}
+	}
+}

@@ -1,7 +1,0 @@
-fragment VotePost on Post {
-	id
-	points
-	upvote {
-		value
-	}
-}

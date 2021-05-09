@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { BuildSchemaOptions } from 'type-graphql';
+import { CreateGameResolver } from '../resolvers/game/create-game.game';
 import { GamesResolver } from '../resolvers/game/games.game';
 import { ChangePasswordResolver } from '../resolvers/user/change-password.user';
 import { ForgotPasswordResolver } from '../resolvers/user/forgot-password.user';
@@ -22,4 +23,5 @@ export const Resolvers: BuildSchemaOptions['resolvers'] = [
 	ChangePasswordResolver,
 	ForgotPasswordResolver,
 	GamesResolver,
+	CreateGameResolver,
 ];

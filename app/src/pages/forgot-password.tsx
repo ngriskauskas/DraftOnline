@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import InputForm from '../components/InputForm';
 import Wrapper from '../components/Wrapper';
 import { useForgotPasswordMutation } from '../generated/graphql';
-import { createUrqlClient } from '../utils/createUrqlClient';
+import { createUrqlClient } from '../graphql/client/createUrqlClient';
 
 const ForgotPassword: FC<{}> = ({}) => {
 	const [, forgotPassword] = useForgotPasswordMutation();

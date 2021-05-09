@@ -32,7 +32,7 @@ export class Game extends BaseEntity {
 	title!: string;
 
 	@Field(() => User)
-	@ManyToOne(() => User, (user) => user.createdGames)
+	@ManyToOne(() => User, (user) => user.createdGames, { onDelete: 'CASCADE' })
 	creator: User;
 
 	@Column()

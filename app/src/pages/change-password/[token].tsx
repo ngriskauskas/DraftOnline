@@ -3,12 +3,12 @@ import NextLink from 'next/link';
 import { withUrqlClient, NextComponentType } from 'next-urql';
 import React, { useState } from 'react';
 import { useChangePasswordMutation } from '../../generated/graphql';
-import { createUrqlClient } from '../../utils/createUrqlClient';
 import InputForm from '../../components/InputForm';
 import { Link } from '@chakra-ui/react';
 import Conditional from '../../components/Conditional';
 import { toErrorMap } from '../../utils/toErrorMap';
 import router from 'next/router';
+import { createUrqlClient } from '../../graphql/client/createUrqlClient';
 
 const ChangePassword: NextPage = () => {
 	const [, changePassword] = useChangePasswordMutation();

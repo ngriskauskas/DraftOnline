@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { useRegisterMutation } from '../generated/graphql';
 import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../utils/createUrqlClient';
 import InputForm from '../components/InputForm';
 import { toErrorMap } from '../utils/toErrorMap';
 import router from 'next/router';
+import { createUrqlClient } from '../graphql/client/createUrqlClient';
 
 interface registerProps {}
 
