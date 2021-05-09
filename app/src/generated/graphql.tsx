@@ -74,8 +74,14 @@ export type PaginationInput = {
 
 export type Query = {
   __typename?: 'Query';
+  game?: Maybe<Game>;
   games: Array<Game>;
   me?: Maybe<User>;
+};
+
+
+export type QueryGameArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -186,6 +192,23 @@ export type RegisterMutation = (
   ) }
 );
 
+export type GameQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type GameQuery = (
+  { __typename?: 'Query' }
+  & { game?: Maybe<(
+    { __typename?: 'Game' }
+    & Pick<Game, 'id' | 'title' | 'createdAt' | 'updatedAt'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  )> }
+);
+
 export type GamesQueryVariables = Exact<{
   limit: Scalars['Int'];
   cursor?: Maybe<Scalars['String']>;
@@ -288,6 +311,24 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const GameDocument = gql`
+    query Game($id: Int!) {
+  game(id: $id) {
+    id
+    title
+    createdAt
+    updatedAt
+    creator {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function useGameQuery(options: Omit<Urql.UseQueryArgs<GameQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GameQuery>({ query: GameDocument, ...options });
 };
 export const GamesDocument = gql`
     query Games($limit: Int!, $cursor: String) {

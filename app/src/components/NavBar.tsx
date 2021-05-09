@@ -36,7 +36,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 						router.reload();
 					}}
 					isLoading={logoutFetching}>
-					Logout
+					logout
 				</Button>
 			</Flex>
 		);

@@ -1,4 +1,4 @@
-import { Arg, FieldResolver, Query, Resolver, Root } from 'type-graphql';
+import { Arg, FieldResolver, Int, Query, Resolver, Root } from 'type-graphql';
 import { LessThan } from 'typeorm';
 import { Game } from '../../entities/Game';
 import { User } from '../../entities/User';
@@ -9,6 +9,11 @@ export class GamesResolver {
 	@FieldResolver()
 	async creator(@Root() game: Game) {
 		return User.findOneOrFail(game.creatorId);
+	}
+
+	@Query(() => Game, { nullable: true })
+	async game(@Arg('id', () => Int) id: number): Promise<Game | undefined> {
+		return Game.findOne(id);
 	}
 
 	@Query(() => [Game])

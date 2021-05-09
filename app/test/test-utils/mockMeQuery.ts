@@ -1,7 +1,7 @@
 import { useMeQuery } from '../../src/generated/graphql';
 import { mockQuery } from './mockQuery';
 
-export const mockMeQuery = (isLoggedIn: boolean) =>
+export const mockMeQuery = (isLoggedIn: boolean, fetching: boolean = false) =>
 	mockQuery({
 		query: useMeQuery,
 		data: {
@@ -11,6 +11,6 @@ export const mockMeQuery = (isLoggedIn: boolean) =>
 						username: 'test',
 				  }
 				: undefined,
-			fetching: false,
 		},
+		fetching,
 	});

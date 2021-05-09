@@ -45,11 +45,11 @@ describe('index page', () => {
 				query: useGamesQuery,
 				data: {
 					games: Array(10)
-						.fill(-1)
+						.fill(1)
 						.map((_, i) => ({
 							id: i,
-							createdAt: -1,
-							updatedAt: -1,
+							createdAt: 1,
+							updatedAt: 1,
 							title: 'Game Title',
 							creator: {
 								id: 0,
