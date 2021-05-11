@@ -1,12 +1,11 @@
+import { Badge, Box, Flex, Heading, Link, Stack } from '@chakra-ui/layout';
 import { withUrqlClient } from 'next-urql';
-import Layout from '../components/Layout';
-import { Link, Stack, Text, Heading, Box, Flex } from '@chakra-ui/layout';
 import NextLink from 'next/link';
-import { useGamesQuery } from '../generated/graphql';
-import { useScroll } from '../utils/useScroll';
-import { useState } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
+import Layout from '../components/Layout';
+import { GameStatus, useGamesQuery } from '../generated/graphql';
 import { createUrqlClient } from '../graphql/client/createUrqlClient';
+import { useScroll } from '../utils/useScroll';
 
 const Index = () => {
 	const [cursor, setCursor] = useState(null as null | string);
@@ -20,6 +19,17 @@ const Index = () => {
 	useScroll(() => {
 		if (data) setCursor(data.games[data.games.length - 1].createdAt);
 	});
+
+	const statusColor = (status: GameStatus) => {
+		switch (status) {
+			case GameStatus.Open:
+				return 'green';
+			case GameStatus.Active:
+				return 'blue';
+			default:
+				return 'red';
+		}
+	};
 
 	return (
 		<Layout variant='regular'>
@@ -45,6 +55,22 @@ const Index = () => {
 												</Link>
 											</NextLink>
 											{game.creator.username}
+										</Box>
+										<Box d='flex' flexDirection='column'>
+											<Badge
+												mb='1'
+												colorScheme={
+													game.meGameUser ? 'purple' : statusColor(game.status)
+												}>
+												{game.meGameUser ? 'Joined' : game.status}
+											</Badge>
+											{game.status === GameStatus.Open && !game.meGameUser && (
+												<NextLink
+													href='/game/[id]/join'
+													as={`/game/${game.id}/join`}>
+													<Link>Join</Link>
+												</NextLink>
+											)}
 										</Box>
 									</Flex>
 								</Box>
