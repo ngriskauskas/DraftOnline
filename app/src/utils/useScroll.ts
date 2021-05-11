@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
-export const usePagination = (updateCursor: () => void) => {
+export const useScroll = (onScrolled: () => void) => {
 	const onScroll = () => {
 		if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-			updateCursor();
+			onScrolled();
 		}
 	};
 	useEffect(() => {

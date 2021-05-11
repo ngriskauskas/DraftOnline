@@ -3,7 +3,7 @@ import React from 'react';
 import Login from '../../src/pages/login';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useLoginMutation } from '../../src/generated/graphql';
-import { mockMutation, mockErrorResponse } from '../test-utils/mockMutation';
+import { mockQuery, mockErrorResponse } from '../test-utils/mockQuery';
 import router from 'next/router';
 import { mocked } from 'ts-jest/utils';
 
@@ -15,7 +15,7 @@ jest.mock('next/router', () => ({
 let login: jest.Mock;
 let mockRouter: any;
 beforeEach(() => {
-	login = mockMutation(useLoginMutation);
+	login = mockQuery({ query: useLoginMutation });
 	mockRouter = mocked(router.push);
 });
 describe('login page', () => {

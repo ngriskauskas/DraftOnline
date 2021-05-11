@@ -3,7 +3,7 @@ import React from 'react';
 import ForgotPassword from '../../src/pages/forgot-password';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useForgotPasswordMutation } from '../../src/generated/graphql';
-import { mockMutation, mockErrorResponse } from '../test-utils/mockMutation';
+import { mockQuery, mockErrorResponse } from '../test-utils/mockQuery';
 import router from 'next/router';
 import { mocked } from 'ts-jest/utils';
 
@@ -15,7 +15,7 @@ jest.mock('next/router', () => ({
 let forgotPassword: jest.Mock;
 let mockRouter: any;
 beforeEach(() => {
-	forgotPassword = mockMutation(useForgotPasswordMutation);
+	forgotPassword = mockQuery({ query: useForgotPasswordMutation });
 	mockRouter = mocked(router.push);
 });
 describe('login page', () => {

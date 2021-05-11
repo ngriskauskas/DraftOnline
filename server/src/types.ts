@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import session from 'express-session';
 import { Redis } from 'ioredis';
+import { createGameUserLoader } from './utils/createGameUserLoader';
 import { createUserLoader } from './utils/createUserLoader';
 
 declare module 'express-session' {
@@ -14,4 +15,5 @@ export type Context = {
 	res: Response;
 	redis: Redis;
 	userLoader: ReturnType<typeof createUserLoader>;
+	gameUserLoader: ReturnType<typeof createGameUserLoader>;
 };

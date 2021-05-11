@@ -9,6 +9,7 @@ import { createUserLoader } from '../utils/createUserLoader';
 import { COOKIE_NAME, __prod__, Resolvers } from './constants';
 import { Redis } from 'ioredis';
 import { buildSchema } from 'type-graphql';
+import { createGameUserLoader } from '../utils/createGameUserLoader';
 
 export const createApp = async (conn: Connection, redis: Redis) => {
 	await conn.runMigrations();
@@ -48,6 +49,7 @@ export const createApp = async (conn: Connection, redis: Redis) => {
 			res,
 			redis,
 			userLoader: createUserLoader(),
+			gameUserLoader: createGameUserLoader(),
 		}),
 	});
 

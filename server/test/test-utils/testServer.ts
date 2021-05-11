@@ -7,7 +7,11 @@ let conn: Connection;
 let redis: Redis.Redis;
 export const initTestServer = async () => {
 	jest.setTimeout(60000);
-	conn = await createConnection(testOrmConfig);
+	try {
+		conn = await createConnection(testOrmConfig);
+	} catch (err) {
+		console.log(err);
+	}
 	redis = new Redis();
 	return await createApp(conn, redis);
 };

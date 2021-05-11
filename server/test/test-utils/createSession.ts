@@ -17,20 +17,26 @@ export const createSession = async (app: Express, isAuth = false) => {
 	if (!isAuth) {
 		return { session, user: undefined };
 	}
-	const user = await User.create({
-		username: 'username',
-		email: 'email@test.com',
-		password: await hash('1234'),
-	}).save();
-	await session
-		.post('/graphql')
-		.expect(200)
-		.send({
-			query: loginMutation,
-			variables: {
-				email: 'email@test.com',
-				password: '1234',
-			},
-		});
-	return { session, user };
+	let user: User;
+	try {
+		user = await User.create({
+			username: 'username',
+			email: 'email@test.com',
+			password: await hash('1234'),
+		}).save();
+		await session
+			.post('/graphql')
+			.expect(200)
+			.send({
+				query: loginMutation,
+				variables: {
+					email: 'email@test.com',
+					password: '1234',
+				},
+			});
+		return { session, user };
+	} catch (err) {
+		console.log(err);
+	}
+	return { session: undefined, user: undefined };
 };

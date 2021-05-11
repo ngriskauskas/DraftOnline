@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field, Int, registerEnumType } from 'type-graphql';
 import {
 	Entity,
 	BaseEntity,
@@ -10,7 +10,18 @@ import {
 	OneToMany,
 } from 'typeorm';
 import { GameUser } from './GameUser';
+import { Team } from './Team';
 import { User } from './User';
+
+export enum GameStatus {
+	Open = 'open',
+	Active = 'active',
+	Complete = 'completed',
+}
+
+registerEnumType(GameStatus, {
+	name: 'GameStatus',
+});
 
 @ObjectType()
 @Entity()
@@ -31,13 +42,24 @@ export class Game extends BaseEntity {
 	@Column()
 	title!: string;
 
-	@Field(() => User)
-	@ManyToOne(() => User, (user) => user.createdGames)
-	creator: User;
+	@Field(() => GameStatus)
+	@Column({
+		type: 'enum',
+		enum: GameStatus,
+		default: GameStatus.Open,
+	})
+	status: GameStatus;
 
 	@Column()
 	creatorId: number;
 
-	@OneToMany(() => GameUser, (gameUser) => gameUser.game)
+	@Field(() => User)
+	@ManyToOne(() => User, (user) => user.createdGames, { onDelete: 'CASCADE' })
+	creator: User;
+
+	@OneToMany(() => GameUser, (gameUser) => gameUser.user)
 	gameUsers: GameUser[];
+
+	@OneToMany(() => Team, (team) => team.game)
+	teams: Team[];
 }

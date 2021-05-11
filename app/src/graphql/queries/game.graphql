@@ -1,0 +1,12 @@
+query Game($id: Int!) {
+	game(id: $id) {
+		id
+		title
+		createdAt
+		updatedAt
+		creator {
+			id
+			username
+		}
+	}
+}
