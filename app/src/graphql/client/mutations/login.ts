@@ -13,5 +13,5 @@ export const login = (_result: any, args: any, cache: any, info: any) => {
 			};
 		}
 	);
-	invalidateAll(cache, 'posts');
+	invalidateAll(cache, 'games');
 };

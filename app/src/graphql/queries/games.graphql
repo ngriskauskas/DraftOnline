@@ -4,6 +4,11 @@ query Games($limit: Int!, $cursor: String) {
 		createdAt
 		updatedAt
 		title
+		status
+		meGameUser {
+			userId
+			gameId
+		}
 		creator {
 			id
 			username

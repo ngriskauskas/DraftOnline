@@ -1,0 +1,3 @@
+mutation JoinGame($id: Int!) {
+	joinGame(input: { id: $id })
+}

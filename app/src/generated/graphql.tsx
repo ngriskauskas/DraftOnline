@@ -29,12 +29,33 @@ export type Game = {
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   title: Scalars['String'];
+  status: GameStatus;
   creator: User;
+  gameUsers: Array<GameUser>;
+  meGameUser?: Maybe<GameUser>;
+};
+
+export enum GameStatus {
+  Open = 'Open',
+  Active = 'Active',
+  Complete = 'Complete'
+}
+
+export type GameUser = {
+  __typename?: 'GameUser';
+  userId: Scalars['Float'];
+  user: User;
+  gameId: Scalars['Float'];
+};
+
+export type JoinGameInput = {
+  id: Scalars['Int'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   createGame: Game;
+  joinGame: Scalars['Boolean'];
   changePassword: User;
   forgotPassword: Scalars['Boolean'];
   login: User;
@@ -45,6 +66,11 @@ export type Mutation = {
 
 export type MutationCreateGameArgs = {
   input: CreateGameInput;
+};
+
+
+export type MutationJoinGameArgs = {
+  input: JoinGameInput;
 };
 
 
@@ -155,6 +181,16 @@ export type ForgotPasswordMutation = (
   & Pick<Mutation, 'forgotPassword'>
 );
 
+export type JoinGameMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type JoinGameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'joinGame'>
+);
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -205,7 +241,10 @@ export type GameQuery = (
     & { creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
-    ) }
+    ), meGameUser?: Maybe<(
+      { __typename?: 'GameUser' }
+      & Pick<GameUser, 'userId' | 'gameId'>
+    )> }
   )> }
 );
 
@@ -219,8 +258,11 @@ export type GamesQuery = (
   { __typename?: 'Query' }
   & { games: Array<(
     { __typename?: 'Game' }
-    & Pick<Game, 'id' | 'createdAt' | 'updatedAt' | 'title'>
-    & { creator: (
+    & Pick<Game, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'status'>
+    & { meGameUser?: Maybe<(
+      { __typename?: 'GameUser' }
+      & Pick<GameUser, 'userId' | 'gameId'>
+    )>, creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
     ) }
@@ -281,6 +323,15 @@ export const ForgotPasswordDocument = gql`
 export function useForgotPasswordMutation() {
   return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
 };
+export const JoinGameDocument = gql`
+    mutation JoinGame($id: Int!) {
+  joinGame(input: {id: $id})
+}
+    `;
+
+export function useJoinGameMutation() {
+  return Urql.useMutation<JoinGameMutation, JoinGameMutationVariables>(JoinGameDocument);
+};
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(input: {email: $email, password: $password}) {
@@ -323,6 +374,10 @@ export const GameDocument = gql`
       id
       username
     }
+    meGameUser {
+      userId
+      gameId
+    }
   }
 }
     `;
@@ -337,6 +392,11 @@ export const GamesDocument = gql`
     createdAt
     updatedAt
     title
+    status
+    meGameUser {
+      userId
+      gameId
+    }
     creator {
       id
       username

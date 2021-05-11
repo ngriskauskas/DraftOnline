@@ -3,7 +3,7 @@ import router from 'next/router';
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { mocked } from 'ts-jest/utils';
-import { useGamesQuery } from '../../src/generated/graphql';
+import { GameStatus, useGamesQuery } from '../../src/generated/graphql';
 import { mockQuery } from '../test-utils/mockQuery';
 import Index from '../../src/pages/index';
 
@@ -51,10 +51,23 @@ describe('index page', () => {
 							createdAt: 1,
 							updatedAt: 1,
 							title: 'Game Title',
+							status:
+								i < 5
+									? GameStatus.Open
+									: i < 8
+									? GameStatus.Complete
+									: GameStatus.Active,
 							creator: {
 								id: 0,
 								username: 'user',
 							},
+							meGameUser:
+								i < 2
+									? {
+											userId: 0,
+											gameId: i,
+									  }
+									: undefined,
 						})),
 				},
 			});
@@ -65,6 +78,11 @@ describe('index page', () => {
 			getByText('Create New Game');
 			expect(getAllByText('Game Title')).toHaveLength(10);
 			expect(getAllByText('user')).toHaveLength(10);
+			expect(getAllByText('Open')).toHaveLength(3);
+			expect(getAllByText('Complete')).toHaveLength(3);
+			expect(getAllByText('Active')).toHaveLength(2);
+			expect(getAllByText('Join')).toHaveLength(3);
+			expect(getAllByText('Joined')).toHaveLength(2);
 		});
 	});
 	describe('when scroll to end of page', () => {
@@ -93,9 +111,7 @@ describe('index page', () => {
 		});
 		it('loads more games', async () => {
 			const mockedUseGamesQuery = useGamesQuery as jest.Mock;
-			const { getByText, getAllByText, findByText } = render(
-				<Index pageProps={null} />
-			);
+			render(<Index pageProps={null} />);
 
 			fireEvent.scroll(window);
 			await waitFor(() => {

@@ -1,25 +1,22 @@
+import 'regenerator-runtime/runtime.js';
 import { render } from '@testing-library/react';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { mocked } from 'ts-jest/utils';
-import { useGameQuery } from '../../src/generated/graphql';
-import Game from '../../src/pages/game/[id]';
-import { mockQuery } from '../test-utils/mockQuery';
+import { useGameQuery } from '../../../src/generated/graphql';
+import Index from '../../../src/pages/game/[id]/index';
+import { mockQuery } from '../../test-utils/mockQuery';
 
-jest.mock('next/router', () => ({
-	query: {},
-	push: jest.fn(),
-}));
-jest.mock('../../src/generated/graphql');
-jest.mock('../../src/components/Navbar', () => {
+jest.mock('next/router');
+jest.mock('../../../src/generated/graphql');
+jest.mock('../../../src/components/Navbar', () => {
 	return () => {
 		return <></>;
 	};
 });
 let game: jest.Mock;
-let mockRouter: any;
+let mockRouter: jest.Mock;
 beforeEach(() => {
-	mockRouter = mocked(router.push);
+	mockRouter = (useRouter as jest.Mock).mockReturnValue({ query: { id: 1 } });
 });
 describe('game page', () => {
 	describe('when page loads', () => {
@@ -41,7 +38,7 @@ describe('game page', () => {
 			});
 		});
 		it('contains correct elements', () => {
-			const { getByText } = render(<Game pageProps={null} />);
+			const { getByText } = render(<Index pageProps={null} />);
 			getByText('Game Title');
 		});
 	});
