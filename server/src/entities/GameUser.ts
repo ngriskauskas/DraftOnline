@@ -1,5 +1,5 @@
-import { ObjectType, Field } from 'type-graphql';
-import { Entity, BaseEntity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Field, ObjectType } from 'type-graphql';
+import { BaseEntity, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Game } from './Game';
 import { User } from './User';
 
@@ -18,7 +18,6 @@ export class GameUser extends BaseEntity {
 	@PrimaryColumn()
 	gameId: number;
 
-	@Field(() => Game)
 	@ManyToOne(() => Game, (game) => game.gameUsers, { onDelete: 'CASCADE' })
 	game: Game;
 }

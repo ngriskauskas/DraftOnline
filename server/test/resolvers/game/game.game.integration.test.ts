@@ -3,6 +3,7 @@ import { Express } from 'express';
 import { createSession } from '../../test-utils/createSession';
 import { Game } from '../../../src/entities/Game';
 import { User } from '../../../src/entities/User';
+import { GameUser } from '../../../src/entities/GameUser';
 
 let app: Express;
 let session: any;
@@ -25,15 +26,24 @@ query Game($id: Int!) {
       id
       username
     }
+		meGameUser {
+			userId
+			gameId
+		}
   }
 }`;
 
 beforeAll(async () => {
 	({ session, user } = await createSession(app, true));
-	await Game.insert({
-		creator: user,
-		title: 'Test',
-	});
+	const game = new Game();
+	game.creator = user!;
+	game.title = 'Test';
+	await game.save();
+
+	const gameUser = new GameUser();
+	gameUser.userId = user!.id;
+	gameUser.gameId = game.id;
+	await gameUser.save();
 });
 
 describe('Game Query: game', () => {
@@ -51,6 +61,10 @@ describe('Game Query: game', () => {
 				creator: {
 					id: 1,
 					username: 'username',
+				},
+				meGameUser: {
+					gameId: 1,
+					userId: 1,
 				},
 			});
 		});

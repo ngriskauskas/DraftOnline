@@ -2,6 +2,8 @@ import { initTestServer, closeTestServer } from '../../test-utils/testServer';
 import { Express } from 'express';
 import { createSession } from '../../test-utils/createSession';
 import { User } from '../../../src/entities/User';
+import { Team } from '../../../src/entities/Team';
+import { NUMTEAMS } from '../../../src/config/constants';
 
 let app: Express;
 
@@ -14,7 +16,7 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-	User.delete(1);
+	await User.delete(1);
 });
 
 const createGameMutation = `
@@ -29,7 +31,7 @@ mutation CreateGame($title: String!) {
   }
 }`;
 
-describe('Game Mutation: create-game', () => {
+describe('Game Mutation: create', () => {
 	describe('when not logged in', () => {
 		it('returns error', async () => {
 			const { session } = await createSession(app);
@@ -48,7 +50,7 @@ describe('Game Mutation: create-game', () => {
 		});
 	});
 	describe('when input is valid', () => {
-		it('returns game', async () => {
+		it('returns game and creates teams', async () => {
 			const { session, user } = await createSession(app, true);
 			const createGameResponse = await session
 				.post('/graphql')
@@ -67,6 +69,8 @@ describe('Game Mutation: create-game', () => {
 				id: 1,
 				title: 'Test',
 			});
+			const teams = await Team.find({ where: { gameId: 1 } });
+			expect(teams).toHaveLength(NUMTEAMS);
 		});
 	});
 	describe('when input is invalid', () => {
