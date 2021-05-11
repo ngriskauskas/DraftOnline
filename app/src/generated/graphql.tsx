@@ -31,8 +31,7 @@ export type Game = {
   title: Scalars['String'];
   status: GameStatus;
   creator: User;
-  gameUsers: Array<GameUser>;
-  meGameUser?: Maybe<GameUser>;
+  meJoined: Scalars['Boolean'];
 };
 
 export enum GameStatus {
@@ -40,13 +39,6 @@ export enum GameStatus {
   Active = 'Active',
   Complete = 'Complete'
 }
-
-export type GameUser = {
-  __typename?: 'GameUser';
-  userId: Scalars['Float'];
-  user: User;
-  gameId: Scalars['Float'];
-};
 
 export type JoinGameInput = {
   id: Scalars['Int'];
@@ -237,14 +229,11 @@ export type GameQuery = (
   { __typename?: 'Query' }
   & { game?: Maybe<(
     { __typename?: 'Game' }
-    & Pick<Game, 'id' | 'title' | 'createdAt' | 'updatedAt'>
+    & Pick<Game, 'id' | 'title' | 'createdAt' | 'updatedAt' | 'meJoined'>
     & { creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
-    ), meGameUser?: Maybe<(
-      { __typename?: 'GameUser' }
-      & Pick<GameUser, 'userId' | 'gameId'>
-    )> }
+    ) }
   )> }
 );
 
@@ -258,11 +247,8 @@ export type GamesQuery = (
   { __typename?: 'Query' }
   & { games: Array<(
     { __typename?: 'Game' }
-    & Pick<Game, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'status'>
-    & { meGameUser?: Maybe<(
-      { __typename?: 'GameUser' }
-      & Pick<GameUser, 'userId' | 'gameId'>
-    )>, creator: (
+    & Pick<Game, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'status' | 'meJoined'>
+    & { creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
     ) }
@@ -374,10 +360,7 @@ export const GameDocument = gql`
       id
       username
     }
-    meGameUser {
-      userId
-      gameId
-    }
+    meJoined
   }
 }
     `;
@@ -393,10 +376,7 @@ export const GamesDocument = gql`
     updatedAt
     title
     status
-    meGameUser {
-      userId
-      gameId
-    }
+    meJoined
     creator {
       id
       username

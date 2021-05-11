@@ -60,11 +60,11 @@ const Index = () => {
 											<Badge
 												mb='1'
 												colorScheme={
-													game.meGameUser ? 'purple' : statusColor(game.status)
+													game.meJoined ? 'purple' : statusColor(game.status)
 												}>
-												{game.meGameUser ? 'Joined' : game.status}
+												{game.meJoined ? 'Joined' : game.status}
 											</Badge>
-											{game.status === GameStatus.Open && !game.meGameUser && (
+											{game.status === GameStatus.Open && !game.meJoined && (
 												<NextLink
 													href='/game/[id]/join'
 													as={`/game/${game.id}/join`}>

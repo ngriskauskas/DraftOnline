@@ -8,9 +8,6 @@ query Game($id: Int!) {
 			id
 			username
 		}
-		meGameUser {
-			userId
-			gameId
-		}
+		meJoined
 	}
 }

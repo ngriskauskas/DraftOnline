@@ -5,10 +5,7 @@ query Games($limit: Int!, $cursor: String) {
 		updatedAt
 		title
 		status
-		meGameUser {
-			userId
-			gameId
-		}
+		meJoined
 		creator {
 			id
 			username

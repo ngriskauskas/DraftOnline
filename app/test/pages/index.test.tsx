@@ -61,13 +61,7 @@ describe('index page', () => {
 								id: 0,
 								username: 'user',
 							},
-							meGameUser:
-								i < 2
-									? {
-											userId: 0,
-											gameId: i,
-									  }
-									: undefined,
+							meJoined: i < 2 ? true : false,
 						})),
 				},
 			});
