@@ -5,24 +5,27 @@ import InputForm from '../components/InputForm';
 import { toErrorMap } from '../utils/toErrorMap';
 import router from 'next/router';
 import { createUrqlClient } from '../graphql/client/createUrqlClient';
+import Wrapper from '../components/Wrapper';
 
 interface registerProps {}
 
 const Register: FC<registerProps> = ({}) => {
 	const [, register] = useRegisterMutation();
 	return (
-		<InputForm
-			inputFields={{ email: '', username: '', password: '' }}
-			submitText='Register'
-			onSubmit={async ({ email, username, password }, { setErrors }) => {
-				const response = await register({ email, username, password });
-				if (response.error) {
-					setErrors(toErrorMap(response.error, 'email'));
-				} else {
-					router.push('/');
-				}
-			}}
-		/>
+		<Wrapper>
+			<InputForm
+				inputFields={{ email: '', username: '', password: '' }}
+				submitText='Register'
+				onSubmit={async ({ email, username, password }, { setErrors }) => {
+					const response = await register({ email, username, password });
+					if (response.error) {
+						setErrors(toErrorMap(response.error, 'email'));
+					} else {
+						router.push('/');
+					}
+				}}
+			/>
+		</Wrapper>
 	);
 };
 

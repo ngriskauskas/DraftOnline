@@ -4,12 +4,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
 	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
 import { Game } from './Game';
-import { GameUser } from './GameUser';
+import { Manager } from './Manager';
 
 @ObjectType()
 @Entity()
@@ -37,9 +38,11 @@ export class User extends BaseEntity {
 	@Column()
 	password!: string;
 
+	@JoinColumn()
 	@OneToMany(() => Game, (game) => game.creator)
 	createdGames: Game[];
 
-	@OneToMany(() => GameUser, (gameUser) => gameUser.user)
-	joinedGames: GameUser[];
+	@JoinColumn()
+	@OneToMany(() => Manager, (manager) => manager.user)
+	managers: Manager[];
 }

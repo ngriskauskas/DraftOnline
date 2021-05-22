@@ -69,7 +69,10 @@ describe('Game Mutation: create', () => {
 				id: 1,
 				title: 'Test',
 			});
-			const teams = await Team.find({ where: { gameId: 1 } });
+			const teams = await Team.find({
+				where: { game: { id: 1 } },
+				relations: ['game'],
+			});
 			expect(teams).toHaveLength(NUMTEAMS);
 		});
 	});

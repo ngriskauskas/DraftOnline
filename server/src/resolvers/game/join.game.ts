@@ -9,7 +9,9 @@ import {
 	UseMiddleware,
 } from 'type-graphql';
 import { Game, GameStatus } from '../../entities/Game';
-import { GameUser } from '../../entities/GameUser';
+import { Manager } from '../../entities/Manager';
+import { Team } from '../../entities/Team';
+import { User } from '../../entities/User';
 import { isAuth } from '../../middlware/isAuth';
 import { Context } from '../../types';
 
@@ -17,6 +19,9 @@ import { Context } from '../../types';
 export class JoinGameInput {
 	@Field(() => Int)
 	id: number;
+
+	@Field(() => Int)
+	teamId: number;
 }
 
 @Resolver(Game)
@@ -24,7 +29,7 @@ export class JoinGameResolver {
 	@Mutation(() => Boolean)
 	@UseMiddleware(isAuth)
 	async joinGame(
-		@Arg('input') { id }: JoinGameInput,
+		@Arg('input') { id, teamId }: JoinGameInput,
 		@Ctx() { req }: Context
 	): Promise<Boolean> {
 		const userId = req.session.userId!;
@@ -33,14 +38,20 @@ export class JoinGameResolver {
 		if (!game) throw new Error('Game not Found');
 		if (game.status != GameStatus.Open) throw new Error('Game not Open');
 
-		const gameUser = await GameUser.findOne({ where: { gameId: id, userId } });
-		if (gameUser) throw new Error('User Already Joined');
+		const manager = await Manager.findOne({
+			where: { game: { id }, user: { id: userId } },
+		});
+		if (manager) throw new Error('User Already Joined');
 
-		await GameUser.create({
-			userId,
-			gameId: id,
-		}).save();
+		const team = await Team.findOne(teamId, { relations: ['manager'] });
+		if (!team) throw new Error('Team not Found');
+		if (team.manager) throw new Error('Team already Taken');
 
+		team.manager = Manager.create({
+			user: await User.findOneOrFail(userId),
+			game,
+		});
+		await team.save();
 		return true;
 	}
 }

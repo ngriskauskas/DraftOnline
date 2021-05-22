@@ -42,6 +42,7 @@ export enum GameStatus {
 
 export type JoinGameInput = {
   id: Scalars['Int'];
+  teamId: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -94,6 +95,7 @@ export type Query = {
   __typename?: 'Query';
   game?: Maybe<Game>;
   games: Array<Game>;
+  teams: Array<Team>;
   me?: Maybe<User>;
 };
 
@@ -105,6 +107,37 @@ export type QueryGameArgs = {
 
 export type QueryGamesArgs = {
   input: PaginationInput;
+};
+
+
+export type QueryTeamsArgs = {
+  input: TeamsInput;
+};
+
+export type Team = {
+  __typename?: 'Team';
+  id: Scalars['Int'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  name: TeamName;
+  manager?: Maybe<User>;
+};
+
+export enum TeamName {
+  Eagles = 'Eagles',
+  Redskins = 'Redskins',
+  Giants = 'Giants',
+  Colts = 'Colts',
+  Steelers = 'Steelers',
+  Bears = 'Bears',
+  Rams = 'Rams',
+  Cardinals = 'Cardinals',
+  Packers = 'Packers',
+  Lions = 'Lions'
+}
+
+export type TeamsInput = {
+  gameId: Scalars['Int'];
 };
 
 export type User = {
@@ -175,6 +208,7 @@ export type ForgotPasswordMutation = (
 
 export type JoinGameMutationVariables = Exact<{
   id: Scalars['Int'];
+  teamId: Scalars['Int'];
 }>;
 
 
@@ -266,6 +300,23 @@ export type MeQuery = (
   )> }
 );
 
+export type TeamsQueryVariables = Exact<{
+  gameId: Scalars['Int'];
+}>;
+
+
+export type TeamsQuery = (
+  { __typename?: 'Query' }
+  & { teams: Array<(
+    { __typename?: 'Team' }
+    & Pick<Team, 'id' | 'name'>
+    & { manager?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    )> }
+  )> }
+);
+
 export const UserFragmentDoc = gql`
     fragment User on User {
   id
@@ -310,8 +361,8 @@ export function useForgotPasswordMutation() {
   return Urql.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument);
 };
 export const JoinGameDocument = gql`
-    mutation JoinGame($id: Int!) {
-  joinGame(input: {id: $id})
+    mutation JoinGame($id: Int!, $teamId: Int!) {
+  joinGame(input: {id: $id, teamId: $teamId})
 }
     `;
 
@@ -398,4 +449,20 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const TeamsDocument = gql`
+    query Teams($gameId: Int!) {
+  teams(input: {gameId: $gameId}) {
+    id
+    name
+    manager {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function useTeamsQuery(options: Omit<Urql.UseQueryArgs<TeamsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<TeamsQuery>({ query: TeamsDocument, ...options });
 };

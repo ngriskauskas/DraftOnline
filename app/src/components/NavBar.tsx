@@ -34,6 +34,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 					onClick={async () => {
 						await logout();
 						router.reload();
+						router.push('/');
 					}}
 					isLoading={logoutFetching}>
 					logout

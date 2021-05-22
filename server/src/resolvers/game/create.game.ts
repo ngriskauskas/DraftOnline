@@ -10,9 +10,11 @@ import {
 } from 'type-graphql';
 import { NUMTEAMS } from '../../config/constants';
 import { Game } from '../../entities/Game';
-import { Team, TeamName } from '../../entities/Team';
+import { User } from '../../entities/User';
 import { isAuth } from '../../middlware/isAuth';
 import { Context } from '../../types';
+import seedTeams from '../../data/teams';
+import { Team } from '../../entities/Team';
 
 @InputType()
 class CreateGameInput {
@@ -31,18 +33,13 @@ export class CreateGameResolver {
 	): Promise<Game> {
 		const game = await Game.create({
 			title,
-			creatorId: req.session.userId,
+			creator: await User.findOneOrFail(req.session.userId),
 		}).save();
 
-		Array(NUMTEAMS)
-			.fill(0)
-			.forEach(async (_, i) => {
-				await Team.create({
-					gameId: game.id,
-					name: TeamName[Object.values(TeamName)[i]],
-				}).save();
-			});
-
+		game.teams = seedTeams(game)
+			.slice(0, NUMTEAMS)
+			.map(({ name, players }) => Team.create({ name, players }));
+		await game.save();
 		return game;
 	}
 }

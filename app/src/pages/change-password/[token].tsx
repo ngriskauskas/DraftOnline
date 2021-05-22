@@ -9,39 +9,42 @@ import Conditional from '../../components/Conditional';
 import { toErrorMap } from '../../utils/toErrorMap';
 import router from 'next/router';
 import { createUrqlClient } from '../../graphql/client/createUrqlClient';
+import Wrapper from '../../components/Wrapper';
 
 const ChangePassword: NextPage = () => {
 	const [, changePassword] = useChangePasswordMutation();
 	const [isTokenExpired, setTokenExpired] = useState(false);
 	return (
-		<InputForm
-			inputFields={{ password: '' }}
-			submitText='Change Password'
-			onSubmit={async ({ password }, { setErrors }) => {
-				const response = await changePassword({
-					token: router.query.token as string,
-					password,
-				});
-				if (response.error) {
-					const errors = toErrorMap(response.error, 'password');
-					setErrors(errors);
-					if (errors['password'] === 'Change Password Token Expired')
-						setTokenExpired(true);
-				} else {
-					router.push('/');
+		<Wrapper>
+			<InputForm
+				inputFields={{ password: '' }}
+				submitText='Change Password'
+				onSubmit={async ({ password }, { setErrors }) => {
+					const response = await changePassword({
+						token: router.query.token as string,
+						password,
+					});
+					if (response.error) {
+						const errors = toErrorMap(response.error, 'password');
+						setErrors(errors);
+						if (errors['password'] === 'Change Password Token Expired')
+							setTokenExpired(true);
+					} else {
+						router.push('/');
+					}
+				}}
+				submissionComponent={
+					<Conditional showing={isTokenExpired}>
+						<NextLink href='/forgot-password'>
+							<Link>Back to Forgot Password</Link>
+						</NextLink>
+					</Conditional>
 				}
-			}}
-			submissionComponent={
-				<Conditional showing={isTokenExpired}>
-					<NextLink href='/forgot-password'>
-						<Link>Back to Forgot Password</Link>
-					</NextLink>
-				</Conditional>
-			}
-		/>
+			/>
+		</Wrapper>
 	);
 };
 
 export default withUrqlClient(createUrqlClient)(
-	(ChangePassword as unknown) as NextComponentType
+	ChangePassword as unknown as NextComponentType
 );

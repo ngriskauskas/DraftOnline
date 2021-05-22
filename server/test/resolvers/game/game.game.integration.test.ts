@@ -3,7 +3,7 @@ import { Express } from 'express';
 import { createSession } from '../../test-utils/createSession';
 import { Game } from '../../../src/entities/Game';
 import { User } from '../../../src/entities/User';
-import { GameUser } from '../../../src/entities/GameUser';
+import { Manager } from '../../../src/entities/Manager';
 
 let app: Express;
 let session: any;
@@ -26,24 +26,22 @@ query Game($id: Int!) {
       id
       username
     }
-		meGameUser {
-			userId
-			gameId
-		}
+		meJoined
   }
 }`;
 
 beforeAll(async () => {
 	({ session, user } = await createSession(app, true));
-	const game = new Game();
-	game.creator = user!;
-	game.title = 'Test';
-	await game.save();
 
-	const gameUser = new GameUser();
-	gameUser.userId = user!.id;
-	gameUser.gameId = game.id;
-	await gameUser.save();
+	await Game.create({
+		creator: user!,
+		title: 'Test',
+		managers: [
+			Manager.create({
+				user,
+			}),
+		],
+	}).save();
 });
 
 describe('Game Query: game', () => {
@@ -62,10 +60,27 @@ describe('Game Query: game', () => {
 					id: 1,
 					username: 'username',
 				},
-				meGameUser: {
-					gameId: 1,
-					userId: 1,
+				meJoined: true,
+			});
+		});
+	});
+	describe('when user is not logged in', () => {
+		it('returns game', async () => {
+			const { session } = await createSession(app);
+			const gameResponse = await session.post('/graphql').send({
+				query: gameQuery,
+				variables: {
+					id: 1,
 				},
+			});
+			expect(gameResponse.body.data.game).toEqual({
+				id: 1,
+				title: 'Test',
+				creator: {
+					id: 1,
+					username: 'username',
+				},
+				meJoined: false,
 			});
 		});
 	});

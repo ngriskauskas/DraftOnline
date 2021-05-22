@@ -8,8 +8,9 @@ import {
 	Column,
 	ManyToOne,
 	OneToMany,
+	JoinColumn,
 } from 'typeorm';
-import { GameUser } from './GameUser';
+import { Manager } from './Manager';
 import { Team } from './Team';
 import { User } from './User';
 
@@ -50,16 +51,16 @@ export class Game extends BaseEntity {
 	})
 	status: GameStatus;
 
-	@Column()
-	creatorId: number;
-
 	@Field(() => User)
 	@ManyToOne(() => User, (user) => user.createdGames, { onDelete: 'CASCADE' })
 	creator: User;
 
-	@OneToMany(() => GameUser, (gameUser) => gameUser.user)
-	gameUsers: GameUser[];
+	//Rethink, maybe go through teams
+	@JoinColumn()
+	@OneToMany(() => Manager, (manager) => manager.game, { cascade: true })
+	managers: Manager[];
 
-	@OneToMany(() => Team, (team) => team.game)
+	@JoinColumn()
+	@OneToMany(() => Team, (team) => team.game, { cascade: true })
 	teams: Team[];
 }

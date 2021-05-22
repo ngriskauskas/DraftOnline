@@ -13,6 +13,7 @@ export class GamesResolver {
 			where: cursor ? { createdAt: LessThan(new Date(parseInt(cursor))) } : {},
 			order: { createdAt: 'DESC' },
 			take: limit,
+			relations: ['creator'],
 		});
 	}
 }

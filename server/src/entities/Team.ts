@@ -7,8 +7,13 @@ import {
 	UpdateDateColumn,
 	Column,
 	ManyToOne,
+	OneToOne,
+	JoinColumn,
+	OneToMany,
 } from 'typeorm';
 import { Game } from './Game';
+import { Manager } from './Manager';
+import { Player } from './Player';
 
 export enum TeamName {
 	Eagles = 'Eagles',
@@ -49,9 +54,19 @@ export class Team extends BaseEntity {
 	})
 	name!: TeamName;
 
-	@Column()
-	gameId: number;
-
 	@ManyToOne(() => Game, (game) => game.teams, { onDelete: 'CASCADE' })
 	game: Game;
+
+	@JoinColumn()
+	@OneToOne(() => Manager, (manager) => manager.team, {
+		nullable: true,
+		cascade: true,
+	})
+	manager: Manager;
+
+	@JoinColumn()
+	@OneToMany(() => Player, (player) => player.team, {
+		cascade: ['insert'],
+	})
+	players: Player[];
 }

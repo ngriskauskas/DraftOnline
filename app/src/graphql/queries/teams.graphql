@@ -1,0 +1,10 @@
+query Teams($gameId: Int!) {
+	teams(input: { gameId: $gameId }) {
+		id
+		name
+		manager {
+			id
+			username
+		}
+	}
+}

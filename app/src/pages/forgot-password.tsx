@@ -9,9 +9,9 @@ const ForgotPassword: FC<{}> = ({}) => {
 	const [, forgotPassword] = useForgotPasswordMutation();
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	return (
-		<>
+		<Wrapper>
 			{isSubmitted ? (
-				<Wrapper variant='small'>Email Sent</Wrapper>
+				<p>Email Sent</p>
 			) : (
 				<InputForm
 					inputFields={{ email: '' }}
@@ -22,7 +22,7 @@ const ForgotPassword: FC<{}> = ({}) => {
 					}}
 				/>
 			)}
-		</>
+		</Wrapper>
 	);
 };
 

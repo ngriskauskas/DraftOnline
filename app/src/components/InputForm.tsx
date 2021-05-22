@@ -26,36 +26,34 @@ const InputForm: FC<FormProps> = ({
 	onSubmit,
 }: FormProps) => {
 	return (
-		<Wrapper variant='small'>
-			<Formik
-				initialValues={{ ...inputFields, ...textFields }}
-				onSubmit={onSubmit}>
-				{({ isSubmitting }) => (
-					<Form>
-						{inputFields &&
-							Object.keys(inputFields).map((field) => (
-								<Box mt={4} key={field}>
-									<InputField name={field} />
-								</Box>
-							))}
-						{textFields &&
-							Object.keys(textFields).map((field) => (
-								<Box mt={4} key={field}>
-									<InputField name={field} textarea />
-								</Box>
-							))}
-						<Flex mt={4}>
-							<Box>
-								<Button type='submit' isLoading={isSubmitting}>
-									{submitText}
-								</Button>
+		<Formik
+			initialValues={{ ...inputFields, ...textFields }}
+			onSubmit={onSubmit}>
+			{({ isSubmitting }) => (
+				<Form>
+					{inputFields &&
+						Object.keys(inputFields).map((field) => (
+							<Box mt={4} key={field}>
+								<InputField name={field} />
 							</Box>
-							<Box ml='auto'>{submissionComponent}</Box>
-						</Flex>
-					</Form>
-				)}
-			</Formik>
-		</Wrapper>
+						))}
+					{textFields &&
+						Object.keys(textFields).map((field) => (
+							<Box mt={4} key={field}>
+								<InputField name={field} textarea />
+							</Box>
+						))}
+					<Flex mt={4}>
+						<Box>
+							<Button type='submit' isLoading={isSubmitting}>
+								{submitText}
+							</Button>
+						</Box>
+						<Box ml='auto'>{submissionComponent}</Box>
+					</Flex>
+				</Form>
+			)}
+		</Formik>
 	);
 };
 

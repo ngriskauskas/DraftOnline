@@ -8,27 +8,19 @@ import {
 	Resolver,
 } from 'type-graphql';
 import { Game } from '../../entities/Game';
-import { GameUser } from '../../entities/GameUser';
 import { Context } from '../../types';
 
 @Resolver(Game)
 export class GameResolver {
-	@FieldResolver()
-	async creator(@Root() game: Game, @Ctx() { userLoader }: Context) {
-		return userLoader.load(game.creatorId);
-	}
-
-	@FieldResolver(() => GameUser, { nullable: true })
-	async meGameUser(
-		@Root() game: Game,
-		@Ctx() { req, gameUserLoader }: Context
-	) {
-		const gameUsers = await gameUserLoader.load(game.id);
-		return gameUsers.find((gameUser) => gameUser.userId === req.session.userId);
+	@FieldResolver(() => Boolean)
+	async meJoined(@Root() game: Game, @Ctx() { req, userLoader }: Context) {
+		if (!req.session.userId) return false;
+		const user = await userLoader.load(req.session.userId);
+		return user.managers.some((manager) => manager.game.id === game.id);
 	}
 
 	@Query(() => Game, { nullable: true })
 	async game(@Arg('id', () => Int) id: number): Promise<Game | undefined> {
-		return Game.findOne(id);
+		return Game.findOne(id, { relations: ['creator'] });
 	}
 }
