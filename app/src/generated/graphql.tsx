@@ -45,6 +45,10 @@ export type JoinGameInput = {
   teamId: Scalars['Int'];
 };
 
+export type MePlayerInput = {
+  gameId: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createGame: Game;
@@ -91,10 +95,42 @@ export type PaginationInput = {
   cursor?: Maybe<Scalars['String']>;
 };
 
+export type Player = {
+  __typename?: 'Player';
+  id: Scalars['Int'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  position: Position;
+  team: Team;
+};
+
+export type PlayerInput = {
+  gameId: Scalars['Int'];
+};
+
+export enum Position {
+  Qb = 'QB',
+  Rb = 'RB',
+  Wr = 'WR',
+  Te = 'TE',
+  Lb = 'LB',
+  T = 'T',
+  G = 'G',
+  C = 'C',
+  De = 'DE',
+  Dt = 'DT',
+  Cb = 'CB',
+  S = 'S',
+  P = 'P',
+  K = 'K'
+}
+
 export type Query = {
   __typename?: 'Query';
   game?: Maybe<Game>;
   games: Array<Game>;
+  mePlayers: Array<Player>;
+  players: Array<Player>;
   teams: Array<Team>;
   me?: Maybe<User>;
 };
@@ -107,6 +143,16 @@ export type QueryGameArgs = {
 
 export type QueryGamesArgs = {
   input: PaginationInput;
+};
+
+
+export type QueryMePlayersArgs = {
+  input: MePlayerInput;
+};
+
+
+export type QueryPlayersArgs = {
+  input: PlayerInput;
 };
 
 
@@ -300,6 +346,36 @@ export type MeQuery = (
   )> }
 );
 
+export type MePlayersQueryVariables = Exact<{
+  gameId: Scalars['Int'];
+}>;
+
+
+export type MePlayersQuery = (
+  { __typename?: 'Query' }
+  & { mePlayers: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id' | 'position'>
+  )> }
+);
+
+export type PlayersQueryVariables = Exact<{
+  gameId: Scalars['Int'];
+}>;
+
+
+export type PlayersQuery = (
+  { __typename?: 'Query' }
+  & { players: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id' | 'position'>
+    & { team: (
+      { __typename?: 'Team' }
+      & Pick<Team, 'id'>
+    ) }
+  )> }
+);
+
 export type TeamsQueryVariables = Exact<{
   gameId: Scalars['Int'];
 }>;
@@ -449,6 +525,33 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const MePlayersDocument = gql`
+    query MePlayers($gameId: Int!) {
+  mePlayers(input: {gameId: $gameId}) {
+    id
+    position
+  }
+}
+    `;
+
+export function useMePlayersQuery(options: Omit<Urql.UseQueryArgs<MePlayersQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MePlayersQuery>({ query: MePlayersDocument, ...options });
+};
+export const PlayersDocument = gql`
+    query Players($gameId: Int!) {
+  players(input: {gameId: $gameId}) {
+    id
+    position
+    team {
+      id
+    }
+  }
+}
+    `;
+
+export function usePlayersQuery(options: Omit<Urql.UseQueryArgs<PlayersQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PlayersQuery>({ query: PlayersDocument, ...options });
 };
 export const TeamsDocument = gql`
     query Teams($gameId: Int!) {

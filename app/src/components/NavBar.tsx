@@ -2,12 +2,16 @@ import { Box, Flex, Link } from '@chakra-ui/layout';
 import React, { FC } from 'react';
 import NextLink from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
-import { Button } from '@chakra-ui/button';
+import { Button, IconButton } from '@chakra-ui/button';
 import router from 'next/router';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 
-interface NavBarProps {}
+interface NavBarProps {
+	onShowSideBar?: () => void;
+	showNavButton: boolean;
+}
 
-const NavBar: FC<NavBarProps> = ({}) => {
+const NavBar: FC<NavBarProps> = ({ onShowSideBar, showNavButton }) => {
 	const [{ data, fetching }] = useMeQuery();
 	const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 	let userInfoBody = null;
@@ -43,7 +47,15 @@ const NavBar: FC<NavBarProps> = ({}) => {
 		);
 	}
 	return (
-		<Flex bg='tomato' p={4}>
+		<Flex bg='tomato' p={4} w='100%' position='sticky' top='0'>
+			{showNavButton && (
+				<IconButton
+					icon={<ChevronRightIcon w={8} h={8} />}
+					aria-label='Open Sidenav'
+					onClick={onShowSideBar}
+					h={8}
+					w={8}></IconButton>
+			)}
 			<Box ml={'auto'}>{userInfoBody}</Box>
 		</Flex>
 	);

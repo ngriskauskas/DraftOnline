@@ -2,7 +2,7 @@ import { Heading } from '@chakra-ui/layout';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import React, { FC } from 'react';
-import Layout from '../../../components/Layout';
+import GameLayout from '../../../components/GameLayout';
 import { useGameQuery } from '../../../generated/graphql';
 import { createUrqlClient } from '../../../graphql/client/createUrqlClient';
 
@@ -13,9 +13,9 @@ const Index: FC = ({}) => {
 	});
 
 	return (
-		<Layout variant='regular'>
+		<GameLayout>
 			<Heading mb={4}>{data?.game?.title}</Heading>
-		</Layout>
+		</GameLayout>
 	);
 };
 

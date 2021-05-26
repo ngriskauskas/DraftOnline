@@ -1,0 +1,6 @@
+query MePlayers($gameId: Int!) {
+	mePlayers(input: { gameId: $gameId }) {
+		id
+		position
+	}
+}

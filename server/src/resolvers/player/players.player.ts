@@ -26,7 +26,7 @@ export class PlayersResolver {
 		if (!game) throw new Error('Game not Found');
 		return Player.find({
 			where: { game: { id: gameId } },
-			relations: ['game'],
+			relations: ['game', 'team'],
 		});
 	}
 }

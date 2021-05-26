@@ -1,0 +1,9 @@
+query Players($gameId: Int!) {
+	players(input: { gameId: $gameId }) {
+		id
+		position
+		team {
+			id
+		}
+	}
+}

@@ -42,9 +42,10 @@ export class Player extends BaseEntity {
 	veteranRating: number;
 
 	@JoinColumn()
-	@ManyToOne(() => Game)
+	@ManyToOne(() => Game, { onDelete: 'CASCADE' })
 	game: Game;
 
+	@Field(() => Team)
 	@ManyToOne(() => Team, (team) => team.players, { nullable: true })
 	team: Team;
 

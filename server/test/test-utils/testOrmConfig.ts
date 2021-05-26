@@ -4,6 +4,7 @@ import { Game } from '../../src/entities/Game';
 import { Manager } from '../../src/entities/Manager';
 import { User } from '../../src/entities/User';
 import { Team } from '../../src/entities/Team';
+import { Player } from '../../src/entities/Player';
 
 export const testOrmConfig: ConnectionOptions = {
 	...ormConfig,
@@ -12,5 +13,5 @@ export const testOrmConfig: ConnectionOptions = {
 	synchronize: true,
 	dropSchema: true,
 	logging: false,
-	entities: [User, Game, Manager, Team],
+	entities: [User, Game, Manager, Team, Player],
 };

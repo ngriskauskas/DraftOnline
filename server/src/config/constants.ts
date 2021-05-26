@@ -4,6 +4,7 @@ import { CreateGameResolver } from '../resolvers/game/create.game';
 import { GameResolver } from '../resolvers/game/game.game';
 import { GamesResolver } from '../resolvers/game/games.game';
 import { JoinGameResolver } from '../resolvers/game/join.game';
+import { MePlayersResolver } from '../resolvers/player/me.player';
 import { PlayersResolver } from '../resolvers/player/players.player';
 import { TeamsResolver } from '../resolvers/team/teams.team';
 import { ChangePasswordResolver } from '../resolvers/user/change-password.user';
@@ -33,6 +34,7 @@ export const Resolvers: BuildSchemaOptions['resolvers'] = [
 	JoinGameResolver,
 	TeamsResolver,
 	PlayersResolver,
+	MePlayersResolver,
 ];
 
 export const NUMTEAMS = 4;
